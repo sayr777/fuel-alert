@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 480" font-family="sans-serif">
+  <rect width="900" height="480" fill="#0F1113"/>
+
+  <!-- sidebar -->
+  <rect x="0" y="0" width="170" height="480" fill="#121417"/>
+  <text x="18" y="34" fill="#EDEFF2" font-size="13" font-weight="800">ДОЗОР<tspan fill="#FFC800">.</tspan>админ</text>
+  <rect x="12" y="54" width="146" height="30" rx="8" fill="#FFC800" opacity="0.15"/>
+  <text x="24" y="74" fill="#FFC800" font-size="12" font-weight="600">Очередь</text>
+  <text x="130" y="74" fill="#FFC800" font-size="11" font-family="monospace">4</text>
+
+  <!-- header -->
+  <text x="192" y="36" fill="#EDEFF2" font-size="15" font-weight="700">Очередь проверки</text>
+  <rect x="192" y="52" width="690" height="1" fill="#2A2E35"/>
+
+  <!-- table header -->
+  <g fill="#6B7684" font-size="10" font-family="monospace">
+    <text x="192" y="78">ID</text>
+    <text x="240" y="78">ТИП</text>
+    <text x="400" y="78">ОПИСАНИЕ</text>
+    <text x="600" y="78">АВТОР</text>
+    <text x="700" y="78">ФЛАГИ</text>
+    <text x="810" y="78">ДЕЙСТВИЯ</text>
+  </g>
+  <rect x="192" y="88" width="690" height="1" fill="#2A2E35"/>
+
+  <!-- rows -->
+  <g font-size="11.5" fill="#C3CBD4">
+    <!-- row 1 -->
+    <text x="192" y="116" fill="#6B7684" font-family="monospace">#4821</text>
+    <rect x="240" y="102" width="110" height="20" rx="10" fill="#C554FF" opacity="0.15" stroke="#C554FF"/>
+    <text x="250" y="116" fill="#C554FF" font-size="10">Незаконная</text>
+    <text x="400" y="116">Продают 95-й из канистр у обочины...</text>
+    <text x="600" y="116" font-family="monospace">@kanistra_watch</text>
+    <rect x="700" y="103" width="120" height="18" rx="5" fill="#FF4B3E" opacity="0.15"/>
+    <text x="706" y="116" fill="#FF8A80" font-size="9.5">ручная проверка</text>
+    <circle cx="815" cy="112" r="10" fill="#3DDC84" opacity="0.2"/>
+    <text x="811" y="116" fill="#3DDC84" font-size="10">✓</text>
+    <circle cx="845" cy="112" r="10" fill="#FF6B60" opacity="0.2"/>
+    <text x="841" y="116" fill="#FF6B60" font-size="10">✕</text>
+
+    <!-- row 2 -->
+    <rect x="192" y="132" width="690" height="1" fill="#20232A"/>
+    <text x="192" y="158" fill="#6B7684" font-family="monospace">#4820</text>
+    <rect x="240" y="144" width="90" height="20" rx="10" fill="#FF4B3E" opacity="0.15" stroke="#FF4B3E"/>
+    <text x="250" y="158" fill="#FF4B3E" font-size="10">Нет топлива</text>
+    <text x="400" y="158">95-го и 100-го нет с самого утра...</text>
+    <text x="600" y="158" font-family="monospace">@moskvich77</text>
+    <rect x="700" y="145" width="90" height="18" rx="5" fill="#5B8CFF" opacity="0.15"/>
+    <text x="706" y="158" fill="#8FB0FF" font-size="9.5">дубликат ×5</text>
+    <circle cx="815" cy="154" r="10" fill="#3DDC84" opacity="0.2"/>
+    <text x="811" y="158" fill="#3DDC84" font-size="10">✓</text>
+    <circle cx="845" cy="154" r="10" fill="#FF6B60" opacity="0.2"/>
+    <text x="841" y="158" fill="#FF6B60" font-size="10">✕</text>
+
+    <!-- row 3 -->
+    <rect x="192" y="174" width="690" height="1" fill="#20232A"/>
+    <text x="192" y="200" fill="#6B7684" font-family="monospace">#4819</text>
+    <rect x="240" y="186" width="100" height="20" rx="10" fill="#FF4FA0" opacity="0.15" stroke="#FF4FA0"/>
+    <text x="250" y="200" fill="#FF4FA0" font-size="10">Контрафакт</text>
+    <text x="400" y="200">Двигатель троит, подозрение на 92-й...</text>
+    <text x="600" y="200" font-family="monospace">@garage_61</text>
+    <rect x="700" y="187" width="120" height="18" rx="5" fill="#FF4B3E" opacity="0.13"/>
+    <text x="706" y="200" fill="#FF8A80" font-size="9.5">EXIF-гео ≠ точке</text>
+    <circle cx="815" cy="196" r="10" fill="#3DDC84" opacity="0.2"/>
+    <text x="811" y="200" fill="#3DDC84" font-size="10">✓</text>
+    <circle cx="845" cy="196" r="10" fill="#FF6B60" opacity="0.2"/>
+    <text x="841" y="200" fill="#FF6B60" font-size="10">✕</text>
+  </g>
+</svg>
