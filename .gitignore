@@ -1,0 +1,28 @@
+# Секреты — коммитим только .env.example
+.env
+.env.local
+
+# Неиспользуемое/вспомогательное — не часть основного стека проекта
+/mcps/
+/terminals/
+/backend-rust/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+*.egg-info/
+
+# Node / frontend
+node_modules/
+dist/
+frontend/dist/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Логи
+*.log

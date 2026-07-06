@@ -1,0 +1,50 @@
+:root {
+  --bg: #0f1113;
+  --map-bg: #0c0e10;
+  --surface: rgba(26, 35, 50, 0.85);
+  --surface-hover: rgba(36, 48, 68, 0.9);
+  --border: rgba(255, 255, 255, 0.1);
+  --text: #edeff2;
+  --text-muted: #93a0ac;
+  --accent: #ffc800;
+  --accent-hover: #e0b000;
+  --success: #3ddc84;
+  --radius: 12px;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
+  --font-body: "Golos Text", system-ui, -apple-system, sans-serif;
+  --font-display: "Unbounded", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+  font-family: var(--font-body);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+input,
+select {
+  font-family: inherit;
+}
+
+a {
+  color: inherit;
+}
