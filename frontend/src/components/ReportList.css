@@ -1,0 +1,99 @@
+.report-list {
+  position: absolute;
+  top: 80px;
+  right: 16px;
+  z-index: 900;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: flex-start;
+  gap: 0;
+  max-height: calc(100% - 100px);
+}
+
+.report-list-toggle {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  padding: 12px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius) 0 0 var(--radius);
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  color: var(--text-muted);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: color 0.15s, background 0.15s;
+}
+
+.report-list.open .report-list-toggle {
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.report-list-toggle:hover {
+  color: var(--text);
+  background: var(--surface-hover);
+}
+
+.report-list-body {
+  width: 280px;
+  overflow-y: auto;
+  background: var(--surface);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: var(--radius) 0 0 var(--radius);
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.report-list-empty {
+  margin: 20px 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+}
+
+.report-list-item {
+  padding: 10px 12px;
+  border-left: 3px solid;
+  border-radius: 8px;
+  background: var(--bg);
+  font-size: 12px;
+}
+
+.rli-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.rli-top strong {
+  font-size: 13px;
+}
+
+.rli-top span {
+  color: var(--text-muted);
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.rli-meta {
+  margin-top: 4px;
+  color: var(--text-muted);
+}
+
+.rli-desc {
+  margin: 6px 0 0;
+  line-height: 1.4;
+  color: var(--text);
+}
+
+.rli-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+}

@@ -1,0 +1,82 @@
+.report-popup {
+  color: var(--text);
+  min-width: 220px;
+}
+
+.popup-header {
+  padding: 0 0 8px;
+  border-left: none;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 8px;
+}
+
+.popup-type {
+  display: block;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.popup-date {
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.popup-body {
+  font-size: 13px;
+}
+
+.popup-row {
+  margin-bottom: 4px;
+}
+
+.popup-row .label {
+  color: var(--text-muted);
+  margin-right: 6px;
+}
+
+.popup-desc {
+  margin: 8px 0 0;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.popup-photos {
+  display: flex;
+  gap: 6px;
+  margin-top: 10px;
+  overflow-x: auto;
+}
+
+.popup-photos img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.popup-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 8px;
+  margin-top: 8px;
+  border-top: 1px solid var(--border);
+  font-size: 11.5px;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+}
+
+.confirm-badge {
+  background: rgba(61, 220, 132, 0.15);
+  color: var(--success);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+}
