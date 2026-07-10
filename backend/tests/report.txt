@@ -1,0 +1,84 @@
+============================= test session info ================================
+platform  : win32
+python    : 3.14.4
+pytest    : 9.1.1
+asyncio   : mode=AUTO (pytest-asyncio 1.4.0)
+rootdir   : backend/
+configfile: pytest.ini
+date      : 2026-07-09
+
+============================= test results ====================================
+
+tests/test_api.py::test_health                                        PASSED
+tests/test_api.py::test_event_types_all_present                       PASSED
+tests/test_api.py::test_event_types_schema                            PASSED
+tests/test_api.py::test_fuel_grades                                   PASSED
+tests/test_api.py::test_list_reports_empty                            PASSED
+tests/test_api.py::test_list_reports_rejects_non_published_status     PASSED
+tests/test_api.py::test_get_report_not_found                          PASSED
+tests/test_api.py::test_moderation_queue_missing_token                PASSED
+tests/test_api.py::test_moderation_queue_wrong_token                  PASSED
+tests/test_api.py::test_moderation_publish_wrong_token                PASSED
+
+tests/test_exif.py::test_extract_invalid_bytes                        PASSED
+tests/test_exif.py::test_extract_jpeg_without_exif                    PASSED
+tests/test_exif.py::test_extract_empty_bytes                          PASSED
+tests/test_exif.py::test_no_exif_no_flags                             PASSED
+tests/test_exif.py::test_time_within_3h_no_flag                       PASSED
+tests/test_exif.py::test_time_over_3h_flagged                         PASSED
+tests/test_exif.py::test_time_naive_treated_as_utc                    PASSED
+tests/test_exif.py::test_gps_close_no_flag                            PASSED
+tests/test_exif.py::test_gps_far_flagged                              PASSED
+tests/test_exif.py::test_both_flags_independent                       PASSED
+
+tests/test_geo.py::test_haversine_same_point                          PASSED
+tests/test_geo.py::test_haversine_moscow_spb                          PASSED
+tests/test_geo.py::test_haversine_100m_latitude                       PASSED
+tests/test_geo.py::test_haversine_symmetry                            PASSED
+tests/test_geo.py::test_region_moscow                                 PASSED
+tests/test_geo.py::test_region_spb                                    PASSED
+tests/test_geo.py::test_region_south_border                           PASSED
+tests/test_geo.py::test_region_west_border                            PASSED
+tests/test_geo.py::test_region_east_border                            PASSED
+tests/test_geo.py::test_region_kamchatka_outside                      PASSED
+tests/test_geo.py::test_region_london_outside                         PASSED
+
+tests/test_validation.py::test_unknown_event_type_rejected            PASSED
+tests/test_validation.py::test_rate_limit_rejected                    PASSED
+tests/test_validation.py::test_outside_region_rejected                PASSED
+tests/test_validation.py::test_event_too_old_rejected                 PASSED
+tests/test_validation.py::test_event_in_future_rejected               PASSED
+tests/test_validation.py::test_published_without_nearby_station       PASSED
+tests/test_validation.py::test_published_with_nearby_station          PASSED
+tests/test_validation.py::test_requires_moderation_stays_pending      PASSED
+tests/test_validation.py::test_review_flags_send_to_pending           PASSED
+tests/test_validation.py::test_duplicate_increments_confirmations     PASSED
+
+============================== summary =======================================
+41 passed, 1 warning in 1.33s
+
+============================= coverage by module ==============================
+
+test_api.py (10 tests)
+  - GET /health
+  - GET /api/v1/event-types  (все 10 типов событий, схема полей)
+  - GET /api/v1/fuel-grades
+  - GET /api/v1/reports      (пустой список, отклонение не-published статуса)
+  - GET /api/v1/reports/999  (404)
+  - GET /api/v1/moderation/queue (422 без токена, 401 с неверным токеном)
+  - POST /api/v1/moderation/1/publish (401 с неверным токеном)
+
+test_exif.py (10 tests)
+  - extract_exif: невалидные байты, JPEG без EXIF, пустые байты
+  - check_exif_consistency: нет EXIF, время в пределах 3ч, превышение 3ч,
+    naive datetime, GPS в пределах 5 км, GPS >5 км, оба флага одновременно
+
+test_geo.py (11 tests)
+  - haversine_m: одна точка (0 м), Москва→СПб (~634 км), 100 м по широте, симметрия
+  - point_in_region: Москва, СПб, границы (юг/запад/восток), Камчатка вне bbox, Лондон
+
+test_validation.py (10 tests)
+  - Hard rejections: неизвестный тип, rate limit, вне региона, слишком старое, в будущем
+  - Happy path: публикация без станции, публикация со станцией
+  - Pending: requires_moderation тип, review_flags
+  - Дедупликация: статус duplicate, инкремент confirmations_count

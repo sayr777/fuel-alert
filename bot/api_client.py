@@ -14,7 +14,8 @@ class ApiClient:
 
     async def _get_session(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
-            self._session = aiohttp.ClientSession(base_url=settings.api_base_url)
+            base = settings.api_base_url.rstrip("/") + "/"
+            self._session = aiohttp.ClientSession(base_url=base)
         return self._session
 
     async def close(self) -> None:
@@ -26,19 +27,19 @@ class ApiClient:
         payload: dict[str, Any] = {"telegram_id": telegram_id}
         if nickname:
             payload["nickname"] = nickname
-        async with session.post("/users/register", json=payload) as resp:
+        async with session.post("users/register", json=payload) as resp:
             resp.raise_for_status()
             return await resp.json()
 
     async def get_event_types(self) -> list[dict[str, Any]]:
         session = await self._get_session()
-        async with session.get("/event-types") as resp:
+        async with session.get("event-types") as resp:
             resp.raise_for_status()
             return await resp.json()
 
     async def get_fuel_grades(self) -> list[str]:
         session = await self._get_session()
-        async with session.get("/fuel-grades") as resp:
+        async with session.get("fuel-grades") as resp:
             resp.raise_for_status()
             return await resp.json()
 
@@ -79,6 +80,6 @@ class ApiClient:
             for filename, data in photos:
                 form.add_field("photos", data, filename=filename, content_type="image/jpeg")
 
-        async with session.post("/reports", data=form) as resp:
+        async with session.post("reports", data=form) as resp:
             resp.raise_for_status()
             return await resp.json()

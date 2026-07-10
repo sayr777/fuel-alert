@@ -9,12 +9,17 @@
 Telegram-бот (aiogram)  ──HTTP (multipart)──►  FastAPI backend  ──►  PostgreSQL + PostGIS
   │                                                  │  │
   │                                                  │  └──► Redis (rate-limit)
-  │                                                  └─────► S3/MinIO (фото)
+  │                                                  └─────► S3 (фото):
+  │                                                           • локально — MinIO
+  │                                                           • продакшн — Yandex Object Storage
   ▼
 Веб-карта (React + MapLibre GL)  ◄──HTTP (JSON)──  FastAPI backend
   │
   └──► Панель модерации (тот же фронтенд, отдельный view, заголовок X-Moderator-Token)
 ```
+
+В продакшн-деплое (`deploy/docker-compose.yml`) фронтенд собирается в Docker-образ на nginx (порт 80),
+который проксирует `/api/` на backend-контейнер. Порты БД и Redis наружу не открываются.
 
 ## Технологический стек
 
@@ -23,7 +28,7 @@ Telegram-бот (aiogram)  ──HTTP (multipart)──►  FastAPI backend  ─
 | Бэкенд API | Python 3.12, FastAPI, SQLAlchemy (async, `asyncpg`), Pydantic Settings |
 | БД | PostgreSQL + расширение PostGIS (геометрия точек, `ST_DWithin`/`ST_Intersects` для дедупликации и bbox-выборок) |
 | Кэш / rate-limit | Redis (sorted set, скользящее окно — `app/services/rate_limit.py`) |
-| Объектное хранилище | S3-совместимое (MinIO в docker-compose) — фотографии обращений |
+| Объектное хранилище | S3-совместимое — фотографии обращений; MinIO в локальном dev, Yandex Object Storage в проде |
 | Бот | Python 3.12, aiogram (FSM-сценарий), обращается к API как обычный HTTP-клиент |
 | Фронтенд | React 19, TypeScript, Vite 6 |
 | Карта | MapLibre GL JS, тайлы/стиль — публичный CARTO `dark-matter-gl-style` |
