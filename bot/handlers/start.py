@@ -1,5 +1,6 @@
 from aiogram import Router
 from aiogram.filters import Command, CommandStart
+from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
 from api_client import ApiClient
@@ -9,7 +10,8 @@ router = Router()
 
 
 @router.message(CommandStart())
-async def cmd_start(message: Message, api: ApiClient) -> None:
+async def cmd_start(message: Message, state: FSMContext, api: ApiClient) -> None:
+    await state.clear()
     await api.register_user(message.from_user.id)
     name = message.from_user.first_name or message.from_user.username or "водитель"
     await message.answer(

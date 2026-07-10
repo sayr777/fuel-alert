@@ -47,6 +47,13 @@ def skip_keyboard(label: str = "Пропустить") -> InlineKeyboardMarkup:
     )
 
 
+def photos_keyboard() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="⏭ Пропустить фото")]],
+        resize_keyboard=True,
+    )
+
+
 def confirm_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(
         inline_keyboard=[
