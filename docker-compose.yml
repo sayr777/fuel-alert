@@ -1,16 +1,16 @@
 services:
   db:
-    image: kartoza/postgis:16-3.4
+    image: postgis/postgis:16-3.4
     environment:
       POSTGRES_USER: fuelwatch
-      POSTGRES_PASS: fuelwatch
-      POSTGRES_DBNAME: fuelwatch
+      POSTGRES_PASSWORD: fuelwatch
+      POSTGRES_DB: fuelwatch
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U fuelwatch"]
+      test: ["CMD-SHELL", "pg_isready -U fuelwatch -d fuelwatch"]
       interval: 5s
       timeout: 5s
       retries: 5
