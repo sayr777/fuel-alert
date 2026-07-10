@@ -63,7 +63,7 @@ async def on_event_type(callback: CallbackQuery, state: FSMContext, api: ApiClie
     attrs = [a for a in event_type["attributes"] if a != "description"]
     if "fuel_grades" in attrs:
         grades = await api.get_fuel_grades()
-        await state.update_data(pending_attrs=attrs[1:], selected_grades=set())
+        await state.update_data(pending_attrs=attrs[1:], selected_grades=[])
         await state.set_state(ReportFlow.choosing_grades)
         await callback.message.edit_text(
             "Выберите марки топлива (можно несколько):",
@@ -79,12 +79,12 @@ async def on_event_type(callback: CallbackQuery, state: FSMContext, api: ApiClie
 async def toggle_grade(callback: CallbackQuery, state: FSMContext, api: ApiClient) -> None:
     grade = callback.data.split(":", 1)[1]
     data = await state.get_data()
-    selected: set[str] = set(data.get("selected_grades", set()))
+    selected: set[str] = set(data.get("selected_grades", []))
     if grade in selected:
         selected.discard(grade)
     else:
         selected.add(grade)
-    await state.update_data(selected_grades=selected)
+    await state.update_data(selected_grades=list(selected))
     grades = await api.get_fuel_grades()
     await callback.message.edit_reply_markup(reply_markup=fuel_grades_keyboard(grades, selected))
     await callback.answer()
@@ -93,7 +93,7 @@ async def toggle_grade(callback: CallbackQuery, state: FSMContext, api: ApiClien
 @router.callback_query(ReportFlow.choosing_grades, F.data == "grades:done")
 async def grades_done(callback: CallbackQuery, state: FSMContext) -> None:
     data = await state.get_data()
-    selected: set[str] = data.get("selected_grades", set())
+    selected: set[str] = set(data.get("selected_grades", []))
     if not selected:
         await callback.answer("Выберите хотя бы одну марку", show_alert=True)
         return
