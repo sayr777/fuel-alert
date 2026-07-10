@@ -43,6 +43,5 @@ Telegram-бота (пропало топливо, лимит, очередь, з
 | `backend/` | FastAPI-бэкенд: приём и выдача обращений, модерация, справочники |
 | `bot/` | Telegram-бот на aiogram — единственный канал приёма обращений от водителей |
 | `frontend/` | React+TypeScript+Vite веб-карта и панель модерации |
-| `backend-rust/` | Экспериментальный Rust-бэкенд (не задействован в основном стеке) |
 | `deploy/` | Продовый docker-compose (Yandex Cloud VM): PostGIS, Redis, YOS, API, фронтенд, бот; `.env.example`, `DEPLOY.md`, `setup-vm.sh` |
 | `docker-compose.yml` | Локальная разработка: PostGIS, Redis, MinIO, API, бот (фронтенд — отдельно `npm run dev`) |
