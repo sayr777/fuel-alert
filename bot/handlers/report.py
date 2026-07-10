@@ -6,6 +6,7 @@ from aiogram.types import CallbackQuery, Message
 
 from api_client import ApiClient
 from keyboards import (
+    comment_keyboard,
     confirm_keyboard,
     event_type_keyboard,
     location_keyboard,
@@ -43,6 +44,12 @@ async def cancel_report(callback: CallbackQuery, state: FSMContext) -> None:
 @router.callback_query(ReportFlow.choosing_type, F.data.startswith("etype:"))
 async def on_event_type(callback: CallbackQuery, state: FSMContext) -> None:
     code = callback.data.split(":", 1)[1]
+    if code == "OTHER":
+        await state.update_data(event_type="OTHER", event_type_label="Другое")
+        await state.set_state(ReportFlow.entering_description)
+        await callback.message.edit_text("✏️ Опишите ситуацию:")
+        await callback.answer()
+        return
     data = await state.get_data()
     event_type = data["event_types"][code]
     await state.update_data(event_type=code, event_type_label=event_type["label_ru"])
@@ -76,7 +83,7 @@ async def on_photo(message: Message, state: FSMContext) -> None:
         await message.answer(f"Фото {len(photos)}/2 принято. Ещё одно или «⏭ Пропустить фото».")
     else:
         await message.answer("Фото 2/2 принято.")
-        await _show_confirmation(message, state)
+        await _ask_comment(message, state)
 
 
 @router.message(ReportFlow.waiting_photos, F.document)
@@ -95,12 +102,28 @@ async def on_photo_file(message: Message, state: FSMContext) -> None:
         await message.answer(f"Фото {len(photos)}/2 принято. Ещё одно или «⏭ Пропустить фото».")
     else:
         await message.answer("Фото 2/2 принято.")
-        await _show_confirmation(message, state)
+        await _ask_comment(message, state)
 
 
 @router.message(ReportFlow.waiting_photos, F.text == "⏭ Пропустить фото")
 async def photos_skip(message: Message, state: FSMContext) -> None:
+    await _ask_comment(message, state)
+
+
+@router.message(ReportFlow.entering_description, F.text == "⏭ Без комментария")
+async def comment_skip(message: Message, state: FSMContext) -> None:
     await _show_confirmation(message, state)
+
+
+@router.message(ReportFlow.entering_description)
+async def on_description(message: Message, state: FSMContext) -> None:
+    await state.update_data(description=message.text.strip())
+    data = await state.get_data()
+    if data.get("event_type") == "OTHER":
+        await state.set_state(ReportFlow.waiting_location)
+        await message.answer("📍 Отправьте геолокацию АЗС:", reply_markup=location_keyboard())
+    else:
+        await _show_confirmation(message, state)
 
 
 @router.callback_query(ReportFlow.confirming, F.data == "confirm:send")
@@ -122,6 +145,7 @@ async def confirm_send(callback: CallbackQuery, state: FSMContext, api: ApiClien
             lat=data["lat"],
             lon=data["lon"],
             event_at=datetime.now(timezone.utc),
+            description=data.get("description"),
             photos=photos,
         )
     except Exception:
@@ -144,6 +168,14 @@ async def confirm_send(callback: CallbackQuery, state: FSMContext, api: ApiClien
     await callback.answer()
 
 
+async def _ask_comment(message: Message, state: FSMContext) -> None:
+    await state.set_state(ReportFlow.entering_description)
+    await message.answer(
+        "💬 Добавьте комментарий (необязательно):",
+        reply_markup=comment_keyboard(),
+    )
+
+
 async def _show_confirmation(message: Message, state: FSMContext) -> None:
     data = await state.get_data()
     photos = data.get("photos", [])
@@ -151,6 +183,8 @@ async def _show_confirmation(message: Message, state: FSMContext) -> None:
         f"Тип: {data['event_type_label']}",
         f"Координаты: {data['lat']:.5f}, {data['lon']:.5f}",
     ]
+    if data.get("description"):
+        lines.append(f"Комментарий: {data['description']}")
     if photos:
         lines.append(f"Фото: {len(photos)} шт.")
 

@@ -100,6 +100,14 @@ EVENT_TYPES: dict[str, EventTypeDef] = {
         ttl_hours=24 * 30,
         attributes=["description", "link"],
     ),
+    "OTHER": EventTypeDef(
+        code="OTHER",
+        label_ru="Другое",
+        color="#6B7280",
+        requires_moderation=True,
+        ttl_hours=24,
+        attributes=["description"],
+    ),
 }
 
 FUEL_GRADES = ["AI92", "AI95", "AI98", "AI100", "DT", "GAS"]
