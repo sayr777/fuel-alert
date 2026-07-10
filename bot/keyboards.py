@@ -15,6 +15,7 @@ def event_type_keyboard(event_types: list[dict]) -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text=et["label_ru"], callback_data=f"etype:{et['code']}")]
         for et in event_types
     ]
+    rows.append([InlineKeyboardButton(text="✏️ Другое", callback_data="etype:OTHER")])
     rows.append([InlineKeyboardButton(text="❌ Отмена", callback_data="cancel")])
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -50,6 +51,13 @@ def skip_keyboard(label: str = "Пропустить") -> InlineKeyboardMarkup:
 def photos_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[[KeyboardButton(text="⏭ Пропустить фото")]],
+        resize_keyboard=True,
+    )
+
+
+def comment_keyboard() -> ReplyKeyboardMarkup:
+    return ReplyKeyboardMarkup(
+        keyboard=[[KeyboardButton(text="⏭ Без комментария")]],
         resize_keyboard=True,
     )
 
