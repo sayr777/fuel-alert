@@ -10,10 +10,11 @@ router = Router()
 
 @router.message(CommandStart())
 async def cmd_start(message: Message, api: ApiClient) -> None:
-    user = await api.register_user(message.from_user.id)
+    await api.register_user(message.from_user.id)
+    name = message.from_user.first_name or message.from_user.username or "водитель"
     await message.answer(
-        f"Привет, {user['nickname']}! 👋\n\n"
-        "Я помогаю водителям Камчатки делиться информацией о топливе на АЗС.\n\n"
+        f"Привет, {name}! 👋\n\n"
+        "Я помогаю водителям делиться информацией о топливе на АЗС.\n\n"
         "Нажмите «📢 Сообщить о ситуации», чтобы отправить отчёт.",
         reply_markup=main_menu_keyboard(),
     )
