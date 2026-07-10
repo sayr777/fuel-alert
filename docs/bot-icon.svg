@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="640" viewBox="0 0 640 640">
+  <defs>
+    <!-- Background gradient: deep navy -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="640" y2="640" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0B1622"/>
+      <stop offset="100%" stop-color="#0F2137"/>
+    </linearGradient>
+
+    <!-- Drop gradient: orange → deep amber -->
+    <linearGradient id="dropGrad" x1="320" y1="110" x2="320" y2="490" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FF9B42"/>
+      <stop offset="55%" stop-color="#F06B1A"/>
+      <stop offset="100%" stop-color="#C84B0C"/>
+    </linearGradient>
+
+    <!-- Drop inner glow -->
+    <radialGradient id="dropGlow" cx="38%" cy="32%" r="55%">
+      <stop offset="0%" stop-color="#FFCC80" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#FF6B00" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Ambient glow behind drop -->
+    <radialGradient id="ambientGlow" cx="50%" cy="52%" r="45%">
+      <stop offset="0%" stop-color="#FF7A20" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#FF7A20" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Drop shadow filter -->
+    <filter id="dropShadow" x="-25%" y="-25%" width="150%" height="150%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="14"/>
+      <feOffset dx="0" dy="8"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.5"/>
+      </feComponentTransfer>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <!-- Bolt glow -->
+    <filter id="boltGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background rounded square -->
+  <rect width="640" height="640" rx="130" fill="url(#bgGrad)"/>
+
+  <!-- Radar / patrol rings (Дозор) -->
+  <circle cx="320" cy="330" r="275" fill="none" stroke="#FF8020" stroke-width="1.5" stroke-opacity="0.10"/>
+  <circle cx="320" cy="330" r="220" fill="none" stroke="#FF8020" stroke-width="1.5" stroke-opacity="0.15"/>
+  <circle cx="320" cy="330" r="162" fill="none" stroke="#FF8020" stroke-width="1.5" stroke-opacity="0.20"/>
+
+  <!-- Radar sweep lines (subtle scan effect) -->
+  <line x1="320" y1="330" x2="556" y2="178" stroke="#FF8020" stroke-width="1" stroke-opacity="0.10"/>
+  <line x1="320" y1="330" x2="84" y2="178" stroke="#FF8020" stroke-width="1" stroke-opacity="0.10"/>
+  <line x1="320" y1="330" x2="320" y2="55" stroke="#FF8020" stroke-width="1" stroke-opacity="0.08"/>
+
+  <!-- Ambient background glow -->
+  <ellipse cx="320" cy="340" rx="210" ry="230" fill="url(#ambientGlow)"/>
+
+  <!-- Fuel drop (teardrop pointing up, round bottom) -->
+  <!-- Point at (320,115), round base center at (320,375), radius 130 -->
+  <path d="
+    M 320 115
+    C 390 185, 450 270, 450 375
+    A 130 130 0 0 1 190 375
+    C 190 270, 250 185, 320 115
+    Z"
+    fill="url(#dropGrad)"
+    filter="url(#dropShadow)"
+  />
+
+  <!-- Inner radial glow on drop -->
+  <path d="
+    M 320 115
+    C 390 185, 450 270, 450 375
+    A 130 130 0 0 1 190 375
+    C 190 270, 250 185, 320 115
+    Z"
+    fill="url(#dropGlow)"
+  />
+
+  <!-- Specular highlight (top-left sheen) -->
+  <path d="M 278 182 C 258 225, 245 270, 248 310"
+        fill="none" stroke="white" stroke-width="9"
+        stroke-linecap="round" stroke-opacity="0.28"/>
+
+  <!-- Lightning bolt inside drop (Топливный Дозор — ALERT) -->
+  <!-- Bold zigzag bolt, white with glow -->
+  <path d="
+    M 348 220
+    L 300 340
+    L 328 340
+    L 290 460
+    L 355 325
+    L 324 325
+    L 366 220
+    Z"
+    fill="white"
+    filter="url(#boltGlow)"
+    opacity="0.95"
+  />
+
+  <!-- Subtle top dot (fuel nozzle tip / indicator) -->
+  <circle cx="320" cy="88" r="10" fill="#FF9B42" opacity="0.5"/>
+  <circle cx="320" cy="88" r="5"  fill="#FFD0A0" opacity="0.7"/>
+</svg>
