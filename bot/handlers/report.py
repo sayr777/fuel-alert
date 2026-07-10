@@ -186,6 +186,14 @@ async def on_location(message: Message, state: FSMContext) -> None:
     )
 
 
+@router.message(ReportFlow.waiting_photos, F.photo)
+async def on_photo_compressed(message: Message) -> None:
+    await message.answer(
+        "Пожалуйста, отправьте фото как файл (скрепка → Файл), чтобы сохранился EXIF.\n"
+        "Или нажмите «Пропустить», если фото не нужно."
+    )
+
+
 @router.message(ReportFlow.waiting_photos, F.document)
 async def on_photo_file(message: Message, state: FSMContext) -> None:
     if not message.document.mime_type or not message.document.mime_type.startswith("image/"):
@@ -196,9 +204,7 @@ async def on_photo_file(message: Message, state: FSMContext) -> None:
     if len(photos) >= 2:
         await message.answer("Максимум 2 фото. Нажмите «Пропустить» для продолжения.")
         return
-    file = await message.bot.get_file(message.document.file_id)
-    downloaded = await message.bot.download_file(file.file_path)
-    photos.append({"filename": message.document.file_name or "photo.jpg", "data": downloaded.read()})
+    photos.append({"filename": message.document.file_name or "photo.jpg", "file_id": message.document.file_id})
     await state.update_data(photos=photos)
     await message.answer(f"Фото {len(photos)}/2 добавлено. Ещё одно или «Пропустить».")
 
@@ -219,7 +225,13 @@ async def photos_done(callback: CallbackQuery, state: FSMContext) -> None:
 async def confirm_send(callback: CallbackQuery, state: FSMContext, api: ApiClient) -> None:
     data = await state.get_data()
     photos_raw = data.get("photos", [])
-    photos = [(p["filename"], p["data"]) for p in photos_raw] if photos_raw else None
+    photos = None
+    if photos_raw:
+        photos = []
+        for p in photos_raw:
+            tg_file = await callback.bot.get_file(p["file_id"])
+            downloaded = await callback.bot.download_file(tg_file.file_path)
+            photos.append((p["filename"], downloaded.read()))
 
     try:
         result = await api.submit_report(
