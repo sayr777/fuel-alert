@@ -6,10 +6,9 @@ import "./Landing.css";
 interface Props {
   eventTypes: EventType[];
   onOpenMap: () => void;
-  onOpenModeration: () => void;
 }
 
-export default function Landing({ eventTypes, onOpenMap, onOpenModeration }: Props) {
+export default function Landing({ eventTypes, onOpenMap }: Props) {
   const available = eventTypes.filter((et) => !et.requires_moderation);
   const violations = eventTypes.filter((et) => et.requires_moderation);
   const fuelType = eventTypes.find((et) => et.attributes.includes("fuel_grades"));
@@ -31,9 +30,6 @@ export default function Landing({ eventTypes, onOpenMap, onOpenModeration }: Pro
         </a>
         <button className="navl navbtn" onClick={onOpenMap}>
           Карта
-        </button>
-        <button className="navl navbtn" onClick={onOpenModeration}>
-          Модерация
         </button>
       </header>
 
@@ -338,19 +334,6 @@ export default function Landing({ eventTypes, onOpenMap, onOpenModeration }: Pro
         </p>
         <button className="card showcase-cta" onClick={onOpenMap}>
           <span>Открыть карту событий</span>
-          <span className="acc">→</span>
-        </button>
-      </section>
-
-      <section className="sec wrap" id="mod">
-        <div className="kick">05 · Панель модератора</div>
-        <h2 className="h2 m0">Очередь проверки</h2>
-        <p className="lead">
-          Автовалидация размечает флаги: расхождение EXIF с заявленной геопозицией, дубликаты,
-          повторные фото. Незаконная торговля и мошенничество публикуются только вручную.
-        </p>
-        <button className="card showcase-cta" onClick={onOpenModeration}>
-          <span>Открыть панель модерации</span>
           <span className="acc">→</span>
         </button>
       </section>
