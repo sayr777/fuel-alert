@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 from typing import Any
 
@@ -72,8 +73,6 @@ class ApiClient:
         if price is not None:
             form.add_field("price", str(price))
         if extra:
-            import json
-
             form.add_field("extra", json.dumps(extra, ensure_ascii=False))
 
         if photos:

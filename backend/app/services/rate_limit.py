@@ -29,8 +29,14 @@ async def check_rate_limit(telegram_id: int) -> bool:
     async with redis.pipeline(transaction=True) as pipe:
         pipe.zremrangebyscore(key, 0, window_start)
         pipe.zcard(key)
+        _, count = await pipe.execute()
+
+    if count >= settings.rate_limit_per_hour:
+        return False
+
+    async with redis.pipeline(transaction=True) as pipe:
         pipe.zadd(key, {str(now): now})
         pipe.expire(key, 3600)
-        _, count, *_ = await pipe.execute()
+        await pipe.execute()
 
-    return count < settings.rate_limit_per_hour
+    return True

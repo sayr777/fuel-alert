@@ -45,14 +45,14 @@ async def cancel_report(callback: CallbackQuery, state: FSMContext) -> None:
 async def on_event_type(callback: CallbackQuery, state: FSMContext) -> None:
     code = callback.data.split(":", 1)[1]
     if code == "OTHER":
-        await state.update_data(event_type="OTHER", event_type_label="Другое")
+        await state.update_data(event_type="OTHER", event_type_label="Другое", event_types=None)
         await state.set_state(ReportFlow.entering_description)
         await callback.message.edit_text("✏️ Опишите ситуацию:")
         await callback.answer()
         return
     data = await state.get_data()
     event_type = data["event_types"][code]
-    await state.update_data(event_type=code, event_type_label=event_type["label_ru"])
+    await state.update_data(event_type=code, event_type_label=event_type["label_ru"], event_types=None)
     await state.set_state(ReportFlow.waiting_location)
     await callback.message.edit_text(f"Выбрано: {event_type['label_ru']}")
     await callback.message.answer("📍 Отправьте геолокацию АЗС:", reply_markup=location_keyboard())
@@ -110,20 +110,22 @@ async def photos_skip(message: Message, state: FSMContext) -> None:
     await _ask_comment(message, state)
 
 
-@router.message(ReportFlow.entering_description, F.text == "⏭ Без комментария")
+@router.message(ReportFlow.entering_description)
+async def on_description(message: Message, state: FSMContext) -> None:
+    await state.update_data(description=message.text.strip())
+    await state.set_state(ReportFlow.waiting_location)
+    await message.answer("📍 Отправьте геолокацию АЗС:", reply_markup=location_keyboard())
+
+
+@router.message(ReportFlow.entering_comment, F.text == "⏭ Без комментария")
 async def comment_skip(message: Message, state: FSMContext) -> None:
     await _show_confirmation(message, state)
 
 
-@router.message(ReportFlow.entering_description)
-async def on_description(message: Message, state: FSMContext) -> None:
+@router.message(ReportFlow.entering_comment)
+async def on_comment(message: Message, state: FSMContext) -> None:
     await state.update_data(description=message.text.strip())
-    data = await state.get_data()
-    if data.get("event_type") == "OTHER":
-        await state.set_state(ReportFlow.waiting_location)
-        await message.answer("📍 Отправьте геолокацию АЗС:", reply_markup=location_keyboard())
-    else:
-        await _show_confirmation(message, state)
+    await _show_confirmation(message, state)
 
 
 @router.callback_query(ReportFlow.confirming, F.data == "confirm:send")
@@ -169,7 +171,7 @@ async def confirm_send(callback: CallbackQuery, state: FSMContext, api: ApiClien
 
 
 async def _ask_comment(message: Message, state: FSMContext) -> None:
-    await state.set_state(ReportFlow.entering_description)
+    await state.set_state(ReportFlow.entering_comment)
     await message.answer(
         "💬 Добавьте комментарий (необязательно):",
         reply_markup=comment_keyboard(),

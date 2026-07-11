@@ -20,7 +20,7 @@ def event_type_keyboard(event_types: list[dict]) -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=rows)
 
 
-def fuel_grades_keyboard(grades: list[str], selected: set[str]) -> InlineKeyboardMarkup:
+def fuel_grades_keyboard(grades: list[str], selected: frozenset[str] | set[str]) -> InlineKeyboardMarkup:
     rows = []
     for grade in grades:
         mark = "✅ " if grade in selected else ""
