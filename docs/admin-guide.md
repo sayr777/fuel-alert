@@ -121,6 +121,31 @@ CARTO с ограничениями по нагрузке — рассмотре
 
 В локальном `docker-compose.yml` `api-init` вызывает все три: `init_db.py` + `seed_demo.py` + `seed_stations.py`. В продовом `deploy/docker-compose.yml` — только `init_db.py` (демо-данные на проде не нужны).
 
+## VPN (Yandex Cloud → Telegram)
+
+Yandex Cloud блокирует исходящие соединения к серверам Telegram. Для работы бота нужен VPN.
+Полная инструкция по установке — в [`deploy/DEPLOY.md`](../deploy/DEPLOY.md), раздел «Шаг 6».
+
+**Автопереподключение каждый час** (VPN-сессия слетает после перезагрузки VM или сетевых сбоев):
+
+```bash
+sudo chmod +x /opt/fuel-alert/deploy/vpn-reconnect.sh
+sudo crontab -e
+# добавить строку:
+# 0 * * * * /opt/fuel-alert/deploy/vpn-reconnect.sh
+```
+
+Логи: `/var/log/vpn-reconnect.log`.
+
+**После перезагрузки VM** нужно вручную переподключиться и перезапустить бота:
+
+```bash
+adguardvpn-cli connect -l "Vilnius"
+cd /opt/fuel-alert/deploy && sudo docker compose restart bot
+```
+
+---
+
 ## Эксплуатационные заметки
 
 - Устаревание событий — фоновая задача `run_expiry_loop` (`backend/app/services/expiry.py`),
