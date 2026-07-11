@@ -47,15 +47,22 @@ async def submit_report(
         raise HTTPException(403, detail="user is banned")
 
     grades = [g.strip() for g in fuel_grades.split(",") if g.strip()] if fuel_grades else None
-    extra_data = json.loads(extra) if extra else None
+    extra_data: dict | None = None
+    if extra:
+        if len(extra) > 4096:
+            raise HTTPException(400, detail="extra field too large")
+        parsed = json.loads(extra)
+        if not isinstance(parsed, dict):
+            raise HTTPException(400, detail="extra must be a JSON object")
+        extra_data = parsed
     event_dt = event_at or datetime.now(timezone.utc)
     if event_dt.tzinfo is None:
         event_dt = event_dt.replace(tzinfo=timezone.utc)
 
     photo_blobs = [await p.read() for p in photos]
+    photo_exif = [extract_exif(blob) for blob in photo_blobs]
     review_flags: list[str] = []
-    for blob in photo_blobs:
-        taken_at, gps = extract_exif(blob)
+    for taken_at, gps in photo_exif:
         review_flags.extend(check_exif_consistency(taken_at, gps, event_dt, lon, lat))
     review_flags = sorted(set(review_flags))
 
@@ -80,8 +87,7 @@ async def submit_report(
         await session.rollback()
         return ReportSubmitResult(id=0, status="rejected", reject_reason=exc.reason)
 
-    for blob in photo_blobs:
-        taken_at, gps = extract_exif(blob)
+    for blob, (taken_at, gps) in zip(photo_blobs, photo_exif):
         s3_key = storage.upload_photo(blob)
         photo = ReportPhoto(
             report_id=report.id,
@@ -104,10 +110,19 @@ async def submit_report(
 
 @router.post("/reports/{report_id}/confirm", response_model=ReportSubmitResult)
 async def confirm_report(report_id: int, telegram_id: int = Form(...), session: AsyncSession = Depends(get_session)) -> ReportSubmitResult:
-    report_result = await session.execute(select(Report).where(Report.id == report_id))
+    user_result = await session.execute(select(User).where(User.telegram_id == telegram_id))
+    user = user_result.scalar_one_or_none()
+    if user is None:
+        raise HTTPException(404, detail="user not registered")
+    if user.is_banned:
+        raise HTTPException(403, detail="user is banned")
+
+    report_result = await session.execute(select(Report).where(Report.id == report_id, Report.status == "published"))
     report = report_result.scalar_one_or_none()
     if report is None:
         raise HTTPException(404, detail="report not found")
+    if report.user_id == user.id:
+        raise HTTPException(400, detail="cannot confirm your own report")
 
     report.confirmations_count += 1
     await session.commit()
