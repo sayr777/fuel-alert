@@ -17,7 +17,7 @@ Telegram → bot container → api
 
 1. Консоль → **Compute Cloud** → **Создать ВМ**
 2. Параметры:
-   - ОС: **Ubuntu 22.04 LTS**
+   - ОС: **Ubuntu 24.04 LTS**
    - vCPU: 2, RAM: 4 GB (минимум; 8 GB комфортнее)
    - Диск: 30 GB SSD
    - Публичный IP: **Присвоить** (или зарезервировать статический)
@@ -98,7 +98,38 @@ sudo docker compose logs -f api
 
 ---
 
-## Шаг 6 (опционально) — HTTPS через Certbot
+## Шаг 6 — VPN для доступа к Telegram
+
+Yandex Cloud блокирует исходящие соединения к серверам Telegram. Для работы бота нужен VPN.
+
+**Вариант: AdGuard VPN CLI** (требует платный аккаунт):
+
+```bash
+# Установка
+curl -fsSL https://raw.githubusercontent.com/AdguardTeam/AdGuardVPNCLI/master/scripts/release/install.sh | sudo sh -s -- -v
+
+# Авторизация
+adguardvpn-cli login --username ВАШ_EMAIL --password ВАШ_ПАРОЛЬ
+
+# Подключение (TUN-режим, например Вильнюс)
+adguardvpn-cli connect -l "Vilnius"
+adguardvpn-cli config set-mode tun
+
+# Проверка
+curl -s https://api.telegram.org  # должен вернуть 200
+```
+
+После подключения перезапустите бота:
+```bash
+cd /opt/fuel-alert/deploy && sudo docker compose restart bot
+```
+
+> VPN-сессия живёт до перезагрузки VM. После рестарта сервера нужно переподключиться вручную
+> или настроить автозапуск через systemd.
+
+---
+
+## Шаг 7 (опционально) — HTTPS через Certbot
 
 Если есть домен, привязанный к IP вашей VM:
 
