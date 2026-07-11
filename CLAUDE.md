@@ -2,4 +2,4 @@
 
 ## Commits
 
-- Do not add `Co-Authored-By:` lines to commit messages.
+- Do not add authorship attribution lines to commit messages.
