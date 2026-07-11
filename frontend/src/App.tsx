@@ -117,7 +117,6 @@ export default function App() {
       <Landing
         eventTypes={eventTypes}
         onOpenMap={() => setView("map")}
-        onOpenModeration={() => setView("moderation")}
       />
     );
   }
