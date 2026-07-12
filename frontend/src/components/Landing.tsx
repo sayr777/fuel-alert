@@ -28,6 +28,9 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
         <a className="navl" href="#bot">
           Бот
         </a>
+        <a className="navl" href="#about">
+          О проекте
+        </a>
         <button className="navl navbtn" onClick={onOpenMap}>
           Карта
         </button>
@@ -336,6 +339,54 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
           <span>Открыть карту событий</span>
           <span className="acc">→</span>
         </button>
+      </section>
+
+      <section className="sec wrap" id="about">
+        <div className="kick">05 · О проекте</div>
+        <h2 className="h2 m0">Карта, которую рисуют сами водители</h2>
+        <p className="lead">
+          Официальные данные о заправках всегда отстают от реальности. Единственный надёжный
+          источник — водители, которые прямо сейчас стоят у колонки и знают, есть ли топливо.
+          «Топливный Дозор» построен на этом принципе.
+        </p>
+
+        <div className="steps">
+          <div className="card step">
+            <div className="stepn disp">2007</div>
+            <div className="stept">Ushahidi, Кения</div>
+            <div className="stepd">
+              Жители сообщали об очагах насилия через SMS — точки на карте помогали
+              гуманитарным службам ориентироваться в кризисе. Технология проста: свидетель
+              видит, сообщает — все видят.
+            </div>
+          </div>
+          <div className="card step">
+            <div className="stepn disp">2011</div>
+            <div className="stept">РосЯма, Россия</div>
+            <div className="stepd">
+              Водители фотографировали дорожные ямы, система автоматически отправляла
+              официальные жалобы. Каждый дефект становился публичной точкой на карте, которую
+              нельзя было игнорировать.
+            </div>
+          </div>
+          <div className="card step">
+            <div className="stepn disp">сегодня</div>
+            <div className="stept">Яндекс Пробки</div>
+            <div className="stepd">
+              Миллионы смартфонов передают анонимные данные о скорости — алгоритм собирает их
+              в живую карту трафика. Каждый водитель одновременно потребитель и источник
+              данных.
+            </div>
+          </div>
+        </div>
+
+        <p className="about-body">
+          «Топливный Дозор» применяет тот же принцип к топливу. Водитель за несколько секунд
+          сообщает через Telegram-бота: нет бензина, есть лимит, завышена цена на табло. Информация
+          сразу появляется на карте для всех остальных. Один человек сэкономил время десяткам
+          других. Завтра кто-то другой предупредит его. Чем больше участников — тем точнее и
+          актуальнее картина.
+        </p>
       </section>
 
       <footer className="foot wrap">
