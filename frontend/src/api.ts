@@ -11,7 +11,7 @@ async function fetchJson<T>(path: string, init?: RequestInit): Promise<T> {
 }
 
 function moderatorHeaders(token: string): HeadersInit {
-  return { "X-Moderator-Token": token };
+  return { "Authorization": `Bearer ${token}` };
 }
 
 export function fetchEventTypes(): Promise<EventType[]> {

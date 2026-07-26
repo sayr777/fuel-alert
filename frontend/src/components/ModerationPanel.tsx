@@ -86,7 +86,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
           <button className="btn-ghost-sm" onClick={onClose}>← Карта</button>
         </div>
         <div className="mod-login">
-          <p>Введите токен модератора (заголовок <code>X-Moderator-Token</code>)</p>
+          <p>Введите токен модератора</p>
           <input
             type="password"
             placeholder="Токен"
