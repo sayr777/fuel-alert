@@ -611,9 +611,166 @@
   scroll-snap-align: start;
 }
 
+.share-row {
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.share-qr-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 24px;
+  flex-shrink: 0;
+}
+
+.share-qr-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.share-qr-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.share-url {
+  word-break: break-all;
+  text-align: center;
+}
+
+.share-tips {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-width: 240px;
+}
+
+.share-tip {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 16px 18px;
+}
+
+.share-tip-icon {
+  font-size: 20px;
+  line-height: 1;
+  flex-shrink: 0;
+  padding-top: 1px;
+}
+
+.share-tip-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.share-tip-text {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 @media (max-width: 900px) {
   .ecards,
   .steps {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .wrap {
+    padding: 0 16px;
+  }
+
+  /* Nav: скрываем текстовые ссылки, оставляем логотип и кнопку карты */
+  .navl:not(.navbtn) {
+    display: none;
+  }
+
+  .nav {
+    padding: 14px 16px;
+    gap: 0;
+  }
+
+  .hero {
+    padding: 48px 0 36px;
+  }
+
+  .sec {
+    padding: 52px 0 0;
+  }
+
+  /* Кнопки hero — во всю ширину */
+  .hero-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+
+  /* Секция телефонов — горизонтальный скролл */
+  .phones {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    margin: 36px -16px 0;
+    padding: 0 16px 4px;
+  }
+
+  .phones::-webkit-scrollbar {
+    display: none;
+  }
+
+  .phcol {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+  }
+
+  .phcol:last-child {
+    padding-right: 16px;
+  }
+
+  /* Определение краудсорсинга — стопка */
+  .cs-def {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cs-def-label {
+    white-space: normal;
+  }
+
+  /* Секция «Расскажи другим» */
+  .share-row {
+    flex-direction: column;
+  }
+
+  .share-qr-card {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .share-tips {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .foot {
+    margin-top: 56px;
   }
 }

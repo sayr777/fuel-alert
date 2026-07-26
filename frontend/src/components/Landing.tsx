@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
-import { TELEGRAM_BOT_URL } from "../config";
+import { QRCodeSVG } from "qrcode.react";
+import { TELEGRAM_BOT_URL, SHARE_URL } from "../config";
 import type { EventType } from "../types";
 import "./Landing.css";
 
@@ -30,6 +31,9 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
         </a>
         <a className="navl" href="#about">
           О проекте
+        </a>
+        <a className="navl" href="#share">
+          Расскажи другим
         </a>
         <button className="navl navbtn" onClick={onOpenMap}>
           Карта
@@ -400,6 +404,18 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
               </div>
             </div>
             <div className="card step">
+              <div className="stepn disp">2013</div>
+              <div className="stept">Светлая линия, МОЭСК</div>
+              <div className="stepd">
+                После ледяного дождя, когда тысячи дач и частных домов остались без света,
+                стало ясно: диспетчеры не успевают обработать поток звонков и не знают,
+                где ситуация хуже. МОЭСК запустила сервис, где жители сообщают об отключениях
+                и авариях на сети. Обращение автоматически попадает к дежурной бригаде,
+                диспетчер говорит, когда ждать восстановления — и люди уже принимают решения,
+                чтобы не замёрзнуть. Жалобы от десяти соседей — приоритетный выезд.
+              </div>
+            </div>
+            <div className="card step">
               <div className="stepn disp">2014</div>
               <div className="stept">Активный гражданин, Москва</div>
               <div className="stepd">
@@ -422,18 +438,6 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
                 люди дорисовали новые дороги, уточнили адреса, разметили пандусы и входы.
               </div>
             </div>
-            <div className="card step">
-              <div className="stepn disp">2013</div>
-              <div className="stept">Светлая линия, МОЭСК</div>
-              <div className="stepd">
-                После ледяного дождя, когда тысячи дач и частных домов остались без света,
-                стало ясно: диспетчеры не успевают обработать поток звонков и не знают,
-                где ситуация хуже. МОЭСК запустила сервис, где жители сообщают об отключениях
-                и авариях на сети. Обращение автоматически попадает к дежурной бригаде,
-                диспетчер говорит, когда ждать восстановления — и люди уже принимают решения,
-                чтобы не замёрзнуть. Жалобы от десяти соседей — приоритетный выезд.
-              </div>
-            </div>
           </div>
         </div>
 
@@ -445,6 +449,58 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
           складывается карта, которой можно доверять. Карта, которую невозможно купить,
           заказать или подделать — потому что её рисуют люди, которые только что были там.
         </p>
+      </section>
+
+      <section className="sec wrap" id="share">
+        <div className="kick">06 · Распространение</div>
+        <h2 className="h2 m0">Расскажи другим</h2>
+        <p className="lead">
+          Карта точнее там, где больше участников. Чем больше водителей присоединится — тем меньше
+          пустых поездок до закрытой заправки у каждого из нас.
+        </p>
+        <div className="share-row">
+          <div className="card share-qr-card">
+            <div className="share-qr-title">
+              <div className="kick" style={{ letterSpacing: "0.14em" }}>Народный мониторинг АЗС</div>
+              <div className="disp fw8 fs16">ТОПЛИВНЫЙ ДОЗОР<span className="acc">.</span></div>
+            </div>
+            <QRCodeSVG value={SHARE_URL} size={160} bgColor="transparent" fgColor="var(--text)" />
+            <div className="share-qr-label">Отсканируйте или отправьте ссылку</div>
+            <div className="share-url mono fs12 mut">{SHARE_URL}</div>
+          </div>
+          <div className="share-tips">
+            <div className="card share-tip">
+              <div className="share-tip-icon">👋</div>
+              <div>
+                <div className="share-tip-title">Таксистам и курьерам</div>
+                <div className="share-tip-text">
+                  Они заправляются каждый день и первыми узнают о перебоях. Их наблюдения
+                  покрывают всю карту города.
+                </div>
+              </div>
+            </div>
+            <div className="card share-tip">
+              <div className="share-tip-icon">🚛</div>
+              <div>
+                <div className="share-tip-title">Дальнобойщикам</div>
+                <div className="share-tip-text">
+                  В дороге информация о трассовых АЗС особенно важна. Один сигнал о закрытой
+                  станции за 200 км экономит несколько часов.
+                </div>
+              </div>
+            </div>
+            <div className="card share-tip">
+              <div className="share-tip-icon">💬</div>
+              <div>
+                <div className="share-tip-title">В автомобильные чаты</div>
+                <div className="share-tip-text">
+                  Районные и городские чаты водителей — лучшее место для распространения.
+                  Там уже обсуждают заправки, просто без единой карты.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <footer className="foot wrap">
