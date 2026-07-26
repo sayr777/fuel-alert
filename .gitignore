@@ -1,4 +1,3 @@
-# Секреты — коммитим только .env.example
 .env
 .env.local
 
@@ -26,3 +25,9 @@ Thumbs.db
 
 # Логи
 *.log
+
+# SSL сертификаты
+cert/
+*.crt
+*.key
+*.pem
