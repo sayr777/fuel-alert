@@ -46,7 +46,7 @@ docker compose --profile bot up -d   # + Telegram-бот (отдельный п�
 | `DATABASE_URL` | Строка подключения к PostgreSQL (`postgresql+asyncpg://...`) |
 | `REDIS_URL` | Подключение к Redis |
 | `S3_ENDPOINT_URL` / `S3_ACCESS_KEY` / `S3_SECRET_KEY` / `S3_BUCKET` / `S3_PUBLIC_URL` | Объектное хранилище фото (MinIO локально, любой S3-совместимый в проде) |
-| `MODERATOR_TOKEN` | Общий секрет для входа в панель модерации (заголовок `X-Moderator-Token`) — **обязательно смените дефолтное значение перед продакшеном** |
+| `MODERATOR_TOKEN` | Общий секрет для входа в панель модерации (заголовок `Authorization: Bearer <token>`) — **обязательно смените дефолтное значение перед продакшеном** |
 | `BOT_TOKEN` | Токен Telegram-бота от BotFather |
 | `API_BASE_URL` | Адрес API, который использует бот (внутри docker-сети — `http://api:8000/api/v1`) |
 
@@ -103,7 +103,7 @@ CARTO с ограничениями по нагрузке — рассмотре
 
 ## Доступ модератора
 
-Модерация защищена одним общим токеном (`MODERATOR_TOKEN` / заголовок `X-Moderator-Token`) — это
+Модерация защищена одним общим токеном (`MODERATOR_TOKEN` / заголовок `Authorization: Bearer <token>`) — это
 осознанное упрощение для небольшой команды на этапе MVP (см. комментарий в
 `backend/app/deps.py:require_moderator`). Перед расширением круга модераторов стоит заменить на
 полноценные аккаунты с логированием личности модератора (сейчас в лог решений `ModerationLog`
@@ -126,22 +126,36 @@ CARTO с ограничениями по нагрузке — рассмотре
 Yandex Cloud блокирует исходящие соединения к серверам Telegram. Для работы бота нужен VPN.
 Полная инструкция по установке — в [`deploy/DEPLOY.md`](../deploy/DEPLOY.md), раздел «Шаг 6».
 
-**Автопереподключение каждый час** (VPN-сессия слетает после перезагрузки VM или сетевых сбоев):
+Бот запускается с `network_mode: host` — это единственный способ, при котором он использует VPN
+хоста. При этом Redis и API-порты должны быть доступны на `127.0.0.1` (см. `deploy/docker-compose.yml`).
+
+**Автопереподключение каждые 5 минут** — крон запускается от **пользователя** (не root),
+потому что AdGuard VPN авторизуется под конкретным пользователем, а root-сессия отдельна:
 
 ```bash
 sudo chmod +x /opt/fuel-alert/deploy/vpn-reconnect.sh
-sudo crontab -e
-# добавить строку:
-# 0 * * * * /opt/fuel-alert/deploy/vpn-reconnect.sh
+
+# Добавить в crontab пользователя (НЕ sudo crontab -e!)
+crontab -e
+# добавить строки:
+# */5 * * * * /opt/fuel-alert/deploy/vpn-reconnect.sh
+# @reboot sleep 30 && /opt/fuel-alert/deploy/vpn-reconnect.sh
 ```
 
-Логи: `/var/log/vpn-reconnect.log`.
-
-**После перезагрузки VM** нужно вручную переподключиться и перезапустить бота:
+Чтобы скрипт мог перезапускать Docker-контейнеры без пароля:
 
 ```bash
+echo 'ВАШ_ПОЛЬЗОВАТЕЛЬ ALL=(ALL) NOPASSWD: /usr/bin/docker' | sudo tee /etc/sudoers.d/user-docker
+```
+
+Скрипт сам проверяет доступность Telegram перед переподключением — VPN не трогается, если всё
+работает. Логи: `/var/log/vpn-reconnect.log`.
+
+**После перезагрузки VM** нужно вручную залогиниться в VPN (cron с `@reboot` перезапустит бота автоматически после):
+
+```bash
+adguardvpn-cli login          # только если сессия слетела
 adguardvpn-cli connect -l "Vilnius"
-cd /opt/fuel-alert/deploy && sudo docker compose restart bot
 ```
 
 ---

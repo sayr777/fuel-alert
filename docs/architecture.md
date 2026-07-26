@@ -15,7 +15,7 @@ Telegram-бот (aiogram)  ──HTTP (multipart)──►  FastAPI backend  ─
   ▼
 Веб-карта (React + MapLibre GL)  ◄──HTTP (JSON)──  FastAPI backend
   │
-  └──► Панель модерации (тот же фронтенд, отдельный view, заголовок X-Moderator-Token)
+  └──► Панель модерации (тот же фронтенд, отдельный view, заголовок Authorization: Bearer)
 ```
 
 В продакшн-деплое (`deploy/docker-compose.yml`) фронтенд собирается в Docker-образ на nginx (порт 80),
@@ -38,7 +38,7 @@ Telegram-бот (aiogram)  ──HTTP (multipart)──►  FastAPI backend  ─
 
 - `main.py` — точка входа FastAPI, регистрирует роутеры, CORS, фоновая задача `run_expiry_loop` (просрочка событий по `ttl_hours`).
 - `event_types.py` — единый справочник типов событий (код, цвет, `requires_moderation`, `ttl_hours`, доп. атрибуты для бота). Отдаётся через `GET /api/v1/event-types` — и бот, и фронтенд читают его оттуда, а не хардкодят.
-- `routers/` — `reports.py` (приём/выборка обращений), `moderation.py` (очередь, публикация/отклонение, авторизация по заголовку `X-Moderator-Token`), `stations.py` (справочник АЗС), `users.py`, `event_types.py`.
+- `routers/` — `reports.py` (приём/выборка обращений), `moderation.py` (очередь, публикация/отклонение, авторизация по заголовку `Authorization: Bearer <token>`), `stations.py` (справочник АЗС), `users.py`, `event_types.py`.
 - `services/validation.py` — конвейер валидации нового обращения: рейт-лимит → проверка географической зоны покрытия (`region_bbox` в `config.py`) → давность события → дедупликация (тот же пользователь + тип события в радиусе `dedup_radius_m` за `dedup_window_minutes`) → публикация сразу или `status=pending`, если `event_type.requires_moderation` или есть `review_flags`.
 - `services/rate_limit.py` — не чаще `rate_limit_per_hour` обращений в час с одного `telegram_id` (Redis ZSET со скользящим окном).
 - `services/exif.py` + `check_exif_consistency` — читает EXIF фото (время съёмки, GPS), помечает `review_flags` (`exif_time_mismatch`, `exif_gps_mismatch`), если расходится с заявленными временем/координатами — это не отклоняет обращение, а просто отправляет его на ручную проверку.
@@ -64,7 +64,7 @@ SPA без роутера — переключение экранов через
 - `components/Landing.tsx` — маркетинговая страница (лендинг), точка входа по умолчанию.
 - `components/MapView.tsx` — MapLibre-карта: маркеры обращений/АЗС, попапы (React-компоненты, смонтированные через `createRoot` в `maplibregl.Popup`), региональный селектор (все субъекты РФ, камера-навигация), геолокация, локализация подписей карты на русский (`localizeLabelsToRussian`).
 - `components/FilterPanel.tsx`, `PeriodControl.tsx`, `ReportList.tsx`, `Legend.tsx` — сворачиваемые вкладки-панели поверх карты (фильтры слева, список отчётов и легенда справа), период — сегмент-контрол в шапке.
-- `components/ModerationPanel.tsx` — очередь модерации (таблица), вход по токену (`X-Moderator-Token`), публикация/отклонение.
+- `components/ModerationPanel.tsx` — очередь модерации (таблица с фото-миниатюрами), вход по токену (`Authorization: Bearer`), публикация/отклонение.
 - `api.ts` / `mocks/` — единая точка доступа к данным; `VITE_USE_MOCKS` (по умолчанию включён) переключает между реальным API и статичными демо-данными (`mocks/data.ts`) — удобно для разработки UI без поднятого бэкенда.
 - `brands.ts`, `event_types` (приходят с бэкенда) — таблицы цветов/иконок для сетей АЗС и типов событий.
 
