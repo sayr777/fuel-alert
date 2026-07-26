@@ -76,7 +76,7 @@ services:
         VITE_TELEGRAM_BOT_URL: ${VITE_TELEGRAM_BOT_URL}
         VITE_USE_MOCKS: "false"
     ports:
-      - "80:80"
+      - "8080:80"
     depends_on:
       - api
     restart: unless-stopped

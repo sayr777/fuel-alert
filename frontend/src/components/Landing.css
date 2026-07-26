@@ -560,6 +560,57 @@
   margin-top: 32px;
 }
 
+.cs-def {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 20px 24px;
+  margin-top: 28px;
+  max-width: 720px;
+  border-left: 3px solid var(--accent);
+  border-radius: 0 14px 14px 0;
+}
+
+.cs-def-label {
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--accent);
+  white-space: nowrap;
+  padding-top: 2px;
+}
+
+.cs-def-text {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--text-muted);
+}
+
+.cs-carousel-wrap {
+  position: relative;
+  margin-top: 32px;
+}
+
+.about-carousel {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.about-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.about-carousel .step {
+  flex-shrink: 0;
+  width: 320px;
+  scroll-snap-align: start;
+}
+
 @media (max-width: 900px) {
   .ecards,
   .steps {
