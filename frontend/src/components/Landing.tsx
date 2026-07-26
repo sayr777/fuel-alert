@@ -366,6 +366,7 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
         </div>
 
         <div className="cs-carousel-wrap">
+          <div className="carousel-hint">листайте →</div>
           <div className="about-carousel">
             <div className="card step">
               <div className="stepn disp">2007</div>
