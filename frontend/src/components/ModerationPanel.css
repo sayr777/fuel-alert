@@ -136,7 +136,7 @@
 
 .mrow {
   display: grid;
-  grid-template-columns: 60px 170px 1fr 130px 150px 160px 76px;
+  grid-template-columns: 60px 170px 1fr 80px 130px 150px 160px 76px;
   gap: 10px;
   align-items: center;
   padding: 11px 16px;
@@ -223,6 +223,29 @@
   flex-shrink: 0;
 }
 
+.mphotos {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.mphoto-thumb {
+  width: 36px;
+  height: 36px;
+  object-fit: cover;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+.mphoto-thumb:hover {
+  opacity: 0.8;
+}
+
+.mut {
+  color: var(--text-muted);
+}
+
 .mactions {
   display: flex;
   gap: 8px;
@@ -264,7 +287,8 @@
     grid-template-columns: 50px 140px 1fr 96px;
   }
   .mstation,
-  .mflags {
+  .mflags,
+  .mphotos {
     display: none;
   }
 }

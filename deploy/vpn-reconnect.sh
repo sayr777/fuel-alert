@@ -22,7 +22,7 @@ sleep 5
 
 if telegram_reachable; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] Telegram reachable, restarting bot"
-    docker compose -f /opt/fuel-alert/deploy/docker-compose.yml restart bot
+    sudo docker compose -f /opt/fuel-alert/deploy/docker-compose.yml restart bot
 else
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARNING: Telegram still unreachable after reconnect"
 fi

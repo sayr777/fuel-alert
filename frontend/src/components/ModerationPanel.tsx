@@ -144,6 +144,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
               <span>ID</span>
               <span>Тип</span>
               <span>Описание</span>
+              <span>Фото</span>
               <span>Автор</span>
               <span>АЗС</span>
               <span>Флаги</span>
@@ -169,6 +170,13 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
                     {p.fuel_grades && <span className="mfuel">{p.fuel_grades.map(gradeLabel).join(", ")} · </span>}
                     {extraLines.length > 0 && <span className="mfuel">{extraLines.join(", ")} · </span>}
                     {p.description ?? "—"}
+                  </span>
+                  <span className="mphotos">
+                    {p.photos.length > 0 ? p.photos.map((photo, i) => (
+                      <a key={i} href={photo.url} target="_blank" rel="noopener noreferrer">
+                        <img src={photo.url} alt="" className="mphoto-thumb" />
+                      </a>
+                    )) : <span className="mut">—</span>}
                   </span>
                   <span className="nick">{p.nickname}</span>
                   <span className="mstation">
