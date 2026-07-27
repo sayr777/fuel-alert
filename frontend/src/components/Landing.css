@@ -709,7 +709,7 @@
 
 @media (max-width: 640px) {
   .wrap {
-    padding: 0 16px;
+    padding: 0 20px;
   }
 
   /* Nav: скрываем текстовые ссылки, оставляем логотип и кнопку карты */
@@ -718,7 +718,7 @@
   }
 
   .nav {
-    padding: 14px 16px;
+    padding: 14px 20px;
     gap: 0;
   }
 
@@ -747,8 +747,8 @@
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
-    margin: 36px -16px 0;
-    padding: 0 16px 4px;
+    margin: 36px -20px 0;
+    padding: 0 20px 4px;
   }
 
   .phones::-webkit-scrollbar {
@@ -761,7 +761,7 @@
   }
 
   .phcol:last-child {
-    padding-right: 16px;
+    padding-right: 20px;
   }
 
   /* Определение краудсорсинга — стопка */
