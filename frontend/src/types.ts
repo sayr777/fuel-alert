@@ -25,8 +25,8 @@ export interface ReportProperties {
   photos: Photo[];
   confirmations_count: number;
   review_flags: string[] | null;
-  status: string | null;
-  reject_reason: string | null;
+  status?: string | null;
+  reject_reason?: string | null;
 }
 
 export interface ReportFeature {
