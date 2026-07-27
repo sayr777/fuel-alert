@@ -1,6 +1,6 @@
 import { USE_MOCKS } from "./config";
 import * as mockApi from "./mocks/api";
-import type { EventType, Filters, ReportFeature, ReportFeatureCollection, Station } from "./types";
+import type { EventType, Filters, HealthStatus, ReportFeature, ReportFeatureCollection, Station } from "./types";
 
 const API_BASE = import.meta.env.VITE_API_URL ?? "/api/v1";
 
@@ -112,6 +112,11 @@ export async function unpublishReport(
     body: form,
   });
   if (!res.ok) throw new Error(`API ${res.status}: unpublish`);
+}
+
+export function fetchHealthStatus(token: string): Promise<HealthStatus> {
+  if (USE_MOCKS) return mockApi.mockFetchHealthStatus();
+  return fetchJson("/moderation/health", { headers: moderatorHeaders(token) });
 }
 
 export async function restoreReport(

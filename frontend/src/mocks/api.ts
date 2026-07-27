@@ -1,4 +1,4 @@
-import type { Filters, ReportFeature, ReportFeatureCollection, Station } from "../types";
+import type { Filters, HealthStatus, ReportFeature, ReportFeatureCollection, Station } from "../types";
 import {
   MOCK_EVENT_TYPES,
   MOCK_FUEL_GRADES,
@@ -94,4 +94,21 @@ export async function mockRestoreReport(reportId: number): Promise<void> {
   await delay();
   const idx = MOCK_REJECTED.findIndex((r) => r.properties.id === reportId);
   if (idx >= 0) MOCK_REJECTED.splice(idx, 1);
+}
+
+export async function mockFetchHealthStatus(): Promise<HealthStatus> {
+  await delay();
+  return {
+    timestamp: new Date().toISOString(),
+    database: { status: "ok", latency_ms: 4 },
+    redis: { status: "ok", latency_ms: 1 },
+    telegram: { status: "ok", latency_ms: 210 },
+    containers: [
+      { name: "deploy-api-1", status: "Up 2 hours", running: true },
+      { name: "deploy-bot-1", status: "Up 22 hours", running: true },
+      { name: "deploy-db-1", status: "Up 22 hours (healthy)", running: true },
+      { name: "deploy-frontend-1", status: "Up 2 hours", running: true },
+      { name: "deploy-redis-1", status: "Up 22 hours (healthy)", running: true },
+    ],
+  };
 }

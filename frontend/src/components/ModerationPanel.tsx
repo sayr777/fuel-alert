@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport, restoreReport, unpublishReport } from "../api";
-import type { EventType, ReportFeature, Station } from "../types";
+import { fetchHealthStatus, fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport, restoreReport, unpublishReport } from "../api";
+import type { ContainerStatus, EventType, HealthStatus, ReportFeature, ServiceHealth, Station } from "../types";
 import { flagLabel, formatExtra, gradeLabel } from "../utils";
 import "./ModerationPanel.css";
 
 const TOKEN_KEY = "fuelwatch-mod-token";
 const MOD_ID_KEY = "fuelwatch-mod-id";
 
-type Tab = "queue" | "published" | "rejected";
+type Tab = "queue" | "published" | "rejected" | "monitoring";
 
 interface Props {
   eventTypeMap: Record<string, EventType>;
@@ -27,6 +27,8 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>("queue");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
+  const [health, setHealth] = useState<HealthStatus | null>(null);
+  const [healthLoading, setHealthLoading] = useState(false);
 
   useEffect(() => {
     fetchStations()
@@ -113,6 +115,24 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
     }
   };
 
+  const loadHealth = useCallback(async () => {
+    setHealthLoading(true);
+    try {
+      const h = await fetchHealthStatus(token);
+      setHealth(h);
+    } catch {
+      setError("Ошибка загрузки статуса сервисов");
+    } finally {
+      setHealthLoading(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (authenticated && activeTab === "monitoring" && !health) {
+      loadHealth();
+    }
+  }, [authenticated, activeTab, health, loadHealth]);
+
   const filteredPublished = useMemo(() => {
     return published.filter((r) => {
       const d = new Date(r.properties.event_at);
@@ -146,10 +166,11 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
     );
   }
 
-  const tabs: { id: Tab; label: string; count: number }[] = [
+  const tabs: { id: Tab; label: string; count?: number }[] = [
     { id: "queue", label: "Очередь", count: queue.length },
     { id: "published", label: "Опубликованные", count: filteredPublished.length },
     { id: "rejected", label: "Удалённые", count: rejected.length },
+    { id: "monitoring", label: "Мониторинг" },
   ];
 
   const activeList = activeTab === "queue" ? queue : activeTab === "published" ? filteredPublished : rejected;
@@ -162,7 +183,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
         {tabs.map((t) => (
           <button key={t.id} className={`msi${activeTab === t.id ? " on" : ""}`} onClick={() => setActiveTab(t.id)}>
             <span>{t.label}</span>
-            <span className="mono fs11">{t.count}</span>
+            {t.count !== undefined && <span className="mono fs11">{t.count}</span>}
           </button>
         ))}
         <button className="btn-ghost-sm mod-back" onClick={onClose}>← Карта</button>
@@ -189,7 +210,11 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
 
         {error && <div className="mod-error">{error}</div>}
 
-        {activeList.length === 0 ? (
+        {activeTab === "monitoring" && (
+          <MonitoringTab health={health} loading={healthLoading} onRefresh={loadHealth} />
+        )}
+
+        {activeTab !== "monitoring" && (activeList.length === 0 ? (
           <div className="mod-empty">
             {activeTab === "queue" ? "Очередь пуста — все отчёты обработаны." : "Нет записей."}
           </div>
@@ -270,8 +295,72 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
               );
             })}
           </div>
-        )}
+        ))}
       </div>
+    </div>
+  );
+}
+
+// ── Monitoring tab ────────────────────────────────────────────────────────────
+
+function SvcCard({ label, svc }: { label: string; svc: ServiceHealth }) {
+  const ok = svc.status === "ok";
+  return (
+    <div className={`svc-card ${ok ? "svc-ok" : "svc-err"}`}>
+      <div className="svc-dot" />
+      <div className="svc-info">
+        <span className="svc-label">{label}</span>
+        {ok
+          ? <span className="svc-val">{svc.latency_ms} мс</span>
+          : <span className="svc-detail">{svc.detail ?? "недоступен"}</span>
+        }
+      </div>
+    </div>
+  );
+}
+
+function ContainerRow({ c }: { c: ContainerStatus }) {
+  return (
+    <div className={`ctr-row ${c.running ? "ctr-ok" : "ctr-err"}`}>
+      <div className="svc-dot" />
+      <span className="ctr-name">{c.name}</span>
+      <span className="ctr-status">{c.status}</span>
+    </div>
+  );
+}
+
+function MonitoringTab({ health, loading, onRefresh }: { health: HealthStatus | null; loading: boolean; onRefresh: () => void }) {
+  return (
+    <div className="mon-wrap">
+      <div className="mon-header">
+        <span className="fw6">Статус сервисов</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {health && <span className="mut" style={{ fontSize: 11 }}>обновлено {new Date(health.timestamp).toLocaleTimeString("ru")}</span>}
+          <button className="btn-ghost-sm" onClick={onRefresh} disabled={loading}>
+            {loading ? "…" : "↻"}
+          </button>
+        </div>
+      </div>
+
+      {loading && !health && <div className="mod-empty">Проверяем сервисы…</div>}
+
+      {health && (
+        <>
+          <div className="mon-section-label">Компоненты</div>
+          <div className="svc-grid">
+            <SvcCard label="База данных" svc={health.database} />
+            <SvcCard label="Redis" svc={health.redis} />
+            <SvcCard label="Telegram / VPN" svc={health.telegram} />
+          </div>
+
+          <div className="mon-section-label">Контейнеры</div>
+          <div className="ctr-list">
+            {health.containers.map((c) => (
+              <ContainerRow key={c.name} c={c} />
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

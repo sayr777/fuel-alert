@@ -66,6 +66,8 @@ services:
       CORS_ORIGINS: '["${DOMAIN_ORIGIN}"]'
     ports:
       - "127.0.0.1:8000:8000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
     depends_on:
       api-init:
         condition: service_completed_successfully

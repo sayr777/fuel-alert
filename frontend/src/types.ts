@@ -50,6 +50,26 @@ export interface Station {
   lon: number;
 }
 
+export interface ServiceHealth {
+  status: "ok" | "error" | "unknown";
+  latency_ms?: number;
+  detail?: string;
+}
+
+export interface ContainerStatus {
+  name: string;
+  status: string;
+  running: boolean;
+}
+
+export interface HealthStatus {
+  timestamp: string;
+  database: ServiceHealth;
+  redis: ServiceHealth;
+  telegram: ServiceHealth;
+  containers: ContainerStatus[];
+}
+
 export interface Filters {
   types: string[];
   grades: string[];
