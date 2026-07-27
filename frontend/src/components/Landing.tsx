@@ -163,7 +163,7 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
                 <div className="tgh">
                   <div className="tgav">Д</div>
                   <div>
-                    <div className="tgn">Топливный Дозор</div>
+                    <a className="tgn tgn-link" href="https://dozor-fuel.online" target="_blank" rel="noopener noreferrer">Топливный Дозор</a>
                     <div className="tgo">бот · онлайн</div>
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
                 <div className="tgh">
                   <div className="tgav">Д</div>
                   <div>
-                    <div className="tgn">Топливный Дозор</div>
+                    <a className="tgn tgn-link" href="https://dozor-fuel.online" target="_blank" rel="noopener noreferrer">Топливный Дозор</a>
                     <div className="tgo">бот · онлайн</div>
                   </div>
                 </div>
@@ -230,7 +230,7 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
                 <div className="tgh">
                   <div className="tgav">Д</div>
                   <div>
-                    <div className="tgn">Топливный Дозор</div>
+                    <a className="tgn tgn-link" href="https://dozor-fuel.online" target="_blank" rel="noopener noreferrer">Топливный Дозор</a>
                     <div className="tgo">бот · онлайн</div>
                   </div>
                 </div>
@@ -265,7 +265,7 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
                 <div className="tgh">
                   <div className="tgav">Д</div>
                   <div>
-                    <div className="tgn">Топливный Дозор</div>
+                    <a className="tgn tgn-link" href="https://dozor-fuel.online" target="_blank" rel="noopener noreferrer">Топливный Дозор</a>
                     <div className="tgo">бот · онлайн</div>
                   </div>
                 </div>
@@ -308,7 +308,7 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
                 <div className="tgh">
                   <div className="tgav">Д</div>
                   <div>
-                    <div className="tgn">Топливный Дозор</div>
+                    <a className="tgn tgn-link" href="https://dozor-fuel.online" target="_blank" rel="noopener noreferrer">Топливный Дозор</a>
                     <div className="tgo">бот · онлайн</div>
                   </div>
                 </div>

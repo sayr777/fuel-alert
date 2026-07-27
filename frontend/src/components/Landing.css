@@ -373,6 +373,15 @@
   color: #edeff2;
 }
 
+.tgn-link {
+  text-decoration: none;
+}
+
+.tgn-link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 .tgo {
   font-size: 11px;
   color: #6ba1cc;
