@@ -29,7 +29,8 @@ export AWS_ACCESS_KEY_ID="$S3_ACCESS_KEY"
 export AWS_SECRET_ACCESS_KEY="$S3_SECRET_KEY"
 export AWS_DEFAULT_REGION=ru-central1
 
-S3="aws s3 --endpoint-url $S3_ENDPOINT_URL --no-progress"
+S3="aws s3 --endpoint-url $S3_ENDPOINT_URL"
+S3UP="aws s3 --endpoint-url $S3_ENDPOINT_URL --no-progress"
 
 mkdir -p "$TMP_DIR"
 
@@ -45,7 +46,7 @@ sudo docker exec deploy-db-1 pg_dump -U "$DB_USER" "$DB_NAME" | gzip > "$DB_FILE
 log "DB: dump ready ($(size "$DB_FILE"))"
 
 log "DB: uploading to s3://$BACKUP_BUCKET/db/..."
-$S3 cp "$DB_FILE" "s3://${BACKUP_BUCKET}/db/$(basename "$DB_FILE")"
+$S3UP cp "$DB_FILE" "s3://${BACKUP_BUCKET}/db/$(basename "$DB_FILE")"
 rm -f "$DB_FILE"
 log "DB: uploaded."
 
@@ -61,7 +62,7 @@ $S3 ls "s3://${BACKUP_BUCKET}/db/" \
 
 # ── 2. Синхронизация фото ─────────────────────────────────────────────────────
 log "Photos: syncing s3://$S3_BUCKET/ → s3://$BACKUP_BUCKET/photos/..."
-$S3 sync "s3://${S3_BUCKET}/" "s3://${BACKUP_BUCKET}/photos/"
+$S3UP sync "s3://${S3_BUCKET}/" "s3://${BACKUP_BUCKET}/photos/"
 log "Photos: sync done."
 
 log "====== Backup complete ======"
