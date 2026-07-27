@@ -53,12 +53,81 @@
   overflow-x: auto;
 }
 
-.popup-photos img {
+.photo-thumb-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 6px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.photo-thumb-btn img {
   width: 80px;
   height: 80px;
   object-fit: cover;
   border-radius: 6px;
   border: 1px solid var(--border);
+  display: block;
+  transition: opacity 0.15s;
+}
+
+.photo-thumb-btn:hover img {
+  opacity: 0.8;
+}
+
+.photo-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.85);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.photo-viewer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 94vw;
+  max-height: 94vh;
+}
+
+.photo-full {
+  max-width: 94vw;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 8px;
+  display: block;
+}
+
+.photo-controls {
+  display: flex;
+  gap: 12px;
+}
+
+.photo-btn {
+  padding: 9px 20px;
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.photo-btn:hover {
+  background: rgba(255,255,255,0.2);
+}
+
+.photo-btn-close {
+  border-color: rgba(255, 100, 100, 0.4);
+  color: #ff9090;
 }
 
 .popup-footer {

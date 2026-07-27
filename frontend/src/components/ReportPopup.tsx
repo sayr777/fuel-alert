@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { createPortal } from "react-dom";
 import type { EventType, ReportFeature } from "../types";
 import { formatDate, formatExtra, gradeLabel } from "../utils";
 import "./ReportPopup.css";
@@ -7,9 +9,46 @@ interface Props {
   eventType?: EventType;
 }
 
+function PhotoViewer({ url, onClose }: { url: string; onClose: () => void }) {
+  const filename = url.split("/").pop() ?? "photo.jpg";
+
+  const handleDownload = async () => {
+    try {
+      const res = await fetch(url);
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = blobUrl;
+      a.download = filename;
+      a.click();
+      URL.revokeObjectURL(blobUrl);
+    } catch {
+      window.open(url, "_blank");
+    }
+  };
+
+  return createPortal(
+    <div className="photo-overlay" onClick={onClose}>
+      <div className="photo-viewer" onClick={(e) => e.stopPropagation()}>
+        <img src={url} alt="Фото" className="photo-full" />
+        <div className="photo-controls">
+          <button className="photo-btn" onClick={handleDownload} title="Скачать">
+            ↓ Сохранить
+          </button>
+          <button className="photo-btn photo-btn-close" onClick={onClose} title="Закрыть">
+            ✕
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
 export default function ReportPopup({ report, eventType }: Props) {
   const p = report.properties;
   const extraLines = formatExtra(p.extra);
+  const [viewerUrl, setViewerUrl] = useState<string | null>(null);
 
   return (
     <div className="report-popup">
@@ -41,9 +80,14 @@ export default function ReportPopup({ report, eventType }: Props) {
         {p.photos.length > 0 && (
           <div className="popup-photos">
             {p.photos.map((photo) => (
-              <a key={photo.url} href={photo.url} target="_blank" rel="noopener noreferrer">
+              <button
+                key={photo.url}
+                className="photo-thumb-btn"
+                onClick={() => setViewerUrl(photo.url)}
+                title="Нажмите для просмотра"
+              >
                 <img src={photo.url} alt="Фото отчёта" loading="lazy" />
-              </a>
+              </button>
             ))}
           </div>
         )}
@@ -55,6 +99,8 @@ export default function ReportPopup({ report, eventType }: Props) {
           <span className="confirm-badge">✓ {p.confirmations_count}</span>
         )}
       </div>
+
+      {viewerUrl && <PhotoViewer url={viewerUrl} onClose={() => setViewerUrl(null)} />}
     </div>
   );
 }

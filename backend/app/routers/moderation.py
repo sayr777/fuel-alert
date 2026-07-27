@@ -67,9 +67,46 @@ async def reject_report(
     return {"id": report_id, "status": "rejected"}
 
 
+@router.post("/{report_id}/unpublish")
+async def unpublish_report(
+    report_id: int,
+    moderator_id: str = Form(...),
+    reason: str = Form("moderator_removed"),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    report = await _get_report_by_status(session, report_id, "published")
+    report.status = "rejected"
+    report.reject_reason = reason
+    session.add(ModerationLog(report_id=report_id, moderator_id=moderator_id, action="unpublish", comment=reason))
+    await session.commit()
+    return {"id": report_id, "status": "rejected"}
+
+
+@router.post("/{report_id}/restore")
+async def restore_report(
+    report_id: int,
+    moderator_id: str = Form(...),
+    session: AsyncSession = Depends(get_session),
+) -> dict:
+    report = await _get_report_by_status(session, report_id, "rejected")
+    report.status = "published"
+    report.reject_reason = None
+    session.add(ModerationLog(report_id=report_id, moderator_id=moderator_id, action="restore", comment=None))
+    await session.commit()
+    return {"id": report_id, "status": "published"}
+
+
 async def _get_pending_report(session: AsyncSession, report_id: int) -> Report:
     result = await session.execute(select(Report).where(Report.id == report_id, Report.status == "pending"))
     report = result.scalar_one_or_none()
     if report is None:
         raise HTTPException(404, detail="pending report not found")
+    return report
+
+
+async def _get_report_by_status(session: AsyncSession, report_id: int, status: str) -> Report:
+    result = await session.execute(select(Report).where(Report.id == report_id, Report.status == status))
+    report = result.scalar_one_or_none()
+    if report is None:
+        raise HTTPException(404, detail=f"report with status={status} not found")
     return report

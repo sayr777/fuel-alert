@@ -95,3 +95,37 @@ export async function rejectReport(
   });
   if (!res.ok) throw new Error(`API ${res.status}: reject`);
 }
+
+export async function unpublishReport(
+  token: string,
+  reportId: number,
+  moderatorId: string,
+  reason: string,
+): Promise<void> {
+  if (USE_MOCKS) return mockApi.mockUnpublishReport(reportId);
+  const form = new FormData();
+  form.append("moderator_id", moderatorId);
+  form.append("reason", reason);
+  const res = await fetch(`${API_BASE}/moderation/${reportId}/unpublish`, {
+    method: "POST",
+    headers: moderatorHeaders(token),
+    body: form,
+  });
+  if (!res.ok) throw new Error(`API ${res.status}: unpublish`);
+}
+
+export async function restoreReport(
+  token: string,
+  reportId: number,
+  moderatorId: string,
+): Promise<void> {
+  if (USE_MOCKS) return mockApi.mockRestoreReport(reportId);
+  const form = new FormData();
+  form.append("moderator_id", moderatorId);
+  const res = await fetch(`${API_BASE}/moderation/${reportId}/restore`, {
+    method: "POST",
+    headers: moderatorHeaders(token),
+    body: form,
+  });
+  if (!res.ok) throw new Error(`API ${res.status}: restore`);
+}

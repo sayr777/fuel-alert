@@ -83,3 +83,15 @@ export async function mockFetchRejectedReports(_token: string): Promise<ReportFe
   await delay();
   return [...MOCK_REJECTED];
 }
+
+export async function mockUnpublishReport(reportId: number): Promise<void> {
+  await delay();
+  const idx = MOCK_PUBLISHED.findIndex((r) => r.properties.id === reportId);
+  if (idx >= 0) MOCK_PUBLISHED.splice(idx, 1);
+}
+
+export async function mockRestoreReport(reportId: number): Promise<void> {
+  await delay();
+  const idx = MOCK_REJECTED.findIndex((r) => r.properties.id === reportId);
+  if (idx >= 0) MOCK_REJECTED.splice(idx, 1);
+}

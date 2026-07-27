@@ -156,11 +156,27 @@
 }
 
 .mrow.mrow-published {
-  grid-template-columns: 60px 170px 1fr 80px 130px 150px 100px;
+  grid-template-columns: 60px 170px 1fr 80px 130px 150px 100px 76px;
 }
 
 .mrow.mrow-rejected {
-  grid-template-columns: 60px 170px 1fr 80px 130px 150px 1fr;
+  grid-template-columns: 60px 170px 1fr 80px 130px 150px 1fr 76px;
+}
+
+.mod-date-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mod-date-filter input[type="date"] {
+  padding: 5px 8px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
 }
 
 .mhead {

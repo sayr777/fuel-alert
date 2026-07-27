@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react";
-import { fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport } from "../api";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport, restoreReport, unpublishReport } from "../api";
 import type { EventType, ReportFeature, Station } from "../types";
 import { flagLabel, formatExtra, gradeLabel } from "../utils";
 import "./ModerationPanel.css";
@@ -25,6 +25,8 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
   const [activeTab, setActiveTab] = useState<Tab>("queue");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
     fetchStations()
@@ -68,9 +70,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
       await publishReport(token, id, moderatorId);
       const item = queue.find((r) => r.properties.id === id);
       setQueue((q) => q.filter((r) => r.properties.id !== id));
-      if (item) {
-        setPublished((prev) => [{ ...item, properties: { ...item.properties, status: "published" } }, ...prev]);
-      }
+      if (item) setPublished((prev) => [{ ...item, properties: { ...item.properties, status: "published" } }, ...prev]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка публикации");
     }
@@ -83,13 +83,48 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
       await rejectReport(token, id, moderatorId, reason);
       const item = queue.find((r) => r.properties.id === id);
       setQueue((q) => q.filter((r) => r.properties.id !== id));
-      if (item) {
-        setRejected((prev) => [{ ...item, properties: { ...item.properties, status: "rejected", reject_reason: reason } }, ...prev]);
-      }
+      if (item) setRejected((prev) => [{ ...item, properties: { ...item.properties, status: "rejected", reject_reason: reason } }, ...prev]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка отклонения");
     }
   };
+
+  const handleUnpublish = async (id: number) => {
+    const reason = prompt("Причина удаления с карты:");
+    if (!reason) return;
+    try {
+      await unpublishReport(token, id, moderatorId, reason);
+      const item = published.find((r) => r.properties.id === id);
+      setPublished((p) => p.filter((r) => r.properties.id !== id));
+      if (item) setRejected((prev) => [{ ...item, properties: { ...item.properties, status: "rejected", reject_reason: reason } }, ...prev]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка удаления");
+    }
+  };
+
+  const handleRestore = async (id: number) => {
+    try {
+      await restoreReport(token, id, moderatorId);
+      const item = rejected.find((r) => r.properties.id === id);
+      setRejected((r) => r.filter((r) => r.properties.id !== id));
+      if (item) setPublished((prev) => [{ ...item, properties: { ...item.properties, status: "published", reject_reason: null } }, ...prev]);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Ошибка восстановления");
+    }
+  };
+
+  const filteredPublished = useMemo(() => {
+    return published.filter((r) => {
+      const d = new Date(r.properties.event_at);
+      if (dateFrom && d < new Date(dateFrom)) return false;
+      if (dateTo) {
+        const end = new Date(dateTo);
+        end.setHours(23, 59, 59, 999);
+        if (d > end) return false;
+      }
+      return true;
+    });
+  }, [published, dateFrom, dateTo]);
 
   if (!authenticated) {
     return (
@@ -100,18 +135,8 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
         </div>
         <div className="mod-login">
           <p>Введите токен модератора</p>
-          <input
-            type="password"
-            placeholder="Токен"
-            value={token}
-            onChange={(e) => setToken(e.target.value)}
-          />
-          <input
-            type="text"
-            placeholder="ID модератора"
-            value={moderatorId}
-            onChange={(e) => setModeratorId(e.target.value)}
-          />
+          <input type="password" placeholder="Токен" value={token} onChange={(e) => setToken(e.target.value)} />
+          <input type="text" placeholder="ID модератора" value={moderatorId} onChange={(e) => setModeratorId(e.target.value)} />
           {error && <div className="mod-error">{error}</div>}
           <button className="btn-primary" onClick={() => loadAll(token)} disabled={!token || loading}>
             {loading ? "Проверка…" : "Войти"}
@@ -123,43 +148,42 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
 
   const tabs: { id: Tab; label: string; count: number }[] = [
     { id: "queue", label: "Очередь", count: queue.length },
-    { id: "published", label: "Опубликованные", count: published.length },
+    { id: "published", label: "Опубликованные", count: filteredPublished.length },
     { id: "rejected", label: "Удалённые", count: rejected.length },
   ];
 
-  const activeList = activeTab === "queue" ? queue : activeTab === "published" ? published : rejected;
-
+  const activeList = activeTab === "queue" ? queue : activeTab === "published" ? filteredPublished : rejected;
   const tabLabel = tabs.find((t) => t.id === activeTab)?.label ?? "";
 
   return (
     <div className="mod">
       <div className="msb">
-        <div className="mlogo">
-          ДОЗОР<span className="acc">.</span>админ
-        </div>
+        <div className="mlogo">ДОЗОР<span className="acc">.</span>админ</div>
         {tabs.map((t) => (
-          <button
-            key={t.id}
-            className={`msi${activeTab === t.id ? " on" : ""}`}
-            onClick={() => setActiveTab(t.id)}
-          >
+          <button key={t.id} className={`msi${activeTab === t.id ? " on" : ""}`} onClick={() => setActiveTab(t.id)}>
             <span>{t.label}</span>
             <span className="mono fs11">{t.count}</span>
           </button>
         ))}
-        <button className="btn-ghost-sm mod-back" onClick={onClose}>
-          ← Карта
-        </button>
+        <button className="btn-ghost-sm mod-back" onClick={onClose}>← Карта</button>
       </div>
 
       <div className="mtb">
         <div className="mod-toolbar">
           <span className="fw6">{tabLabel}</span>
           <div className="mod-header-actions">
+            {activeTab === "published" && (
+              <div className="mod-date-filter">
+                <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} title="От" />
+                <span className="mut">—</span>
+                <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} title="До" />
+                {(dateFrom || dateTo) && (
+                  <button className="btn-ghost-sm" onClick={() => { setDateFrom(""); setDateTo(""); }} title="Сбросить">✕</button>
+                )}
+              </div>
+            )}
             {loading && <span className="status-pill">Обновление…</span>}
-            <button className="btn-ghost-sm" onClick={() => loadAll(token)} disabled={loading}>
-              ↻
-            </button>
+            <button className="btn-ghost-sm" onClick={() => loadAll(token)} disabled={loading}>↻</button>
           </div>
         </div>
 
@@ -181,7 +205,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
               {activeTab === "queue" && <span>Флаги</span>}
               {activeTab === "rejected" && <span>Причина</span>}
               {activeTab === "published" && <span>Подтверждений</span>}
-              {activeTab === "queue" && <span>Действия</span>}
+              <span>Действия</span>
             </div>
             {activeList.map((r) => {
               const p = r.properties;
@@ -217,13 +241,9 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
                   </span>
                   {activeTab === "queue" && (
                     <span className="mflags">
-                      {p.review_flags && p.review_flags.length > 0 ? (
-                        p.review_flags.map((f) => (
-                          <span key={f} className="flag">{flagLabel(f)}</span>
-                        ))
-                      ) : (
-                        <span className="mut">—</span>
-                      )}
+                      {p.review_flags && p.review_flags.length > 0
+                        ? p.review_flags.map((f) => <span key={f} className="flag">{flagLabel(f)}</span>)
+                        : <span className="mut">—</span>}
                     </span>
                   )}
                   {activeTab === "rejected" && (
@@ -232,12 +252,20 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
                   {activeTab === "published" && (
                     <span className="mconfirm">{p.confirmations_count}</span>
                   )}
-                  {activeTab === "queue" && (
-                    <span className="mactions">
-                      <button className="abtn y" onClick={() => handlePublish(p.id)} title="Опубликовать">✓</button>
-                      <button className="abtn n" onClick={() => handleReject(p.id)} title="Отклонить">✕</button>
-                    </span>
-                  )}
+                  <span className="mactions">
+                    {activeTab === "queue" && (
+                      <>
+                        <button className="abtn y" onClick={() => handlePublish(p.id)} title="Опубликовать">✓</button>
+                        <button className="abtn n" onClick={() => handleReject(p.id)} title="Отклонить">✕</button>
+                      </>
+                    )}
+                    {activeTab === "published" && (
+                      <button className="abtn n" onClick={() => handleUnpublish(p.id)} title="Убрать с карты">🗑</button>
+                    )}
+                    {activeTab === "rejected" && (
+                      <button className="abtn y" onClick={() => handleRestore(p.id)} title="Восстановить на карту">↩</button>
+                    )}
+                  </span>
                 </div>
               );
             })}
