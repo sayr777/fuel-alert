@@ -31,6 +31,8 @@ class ReportProperties(BaseModel):
     photos: list[PhotoOut]
     confirmations_count: int
     review_flags: list[str] | None = None
+    status: str | None = None
+    reject_reason: str | None = None
 
 
 class ReportFeature(BaseModel):

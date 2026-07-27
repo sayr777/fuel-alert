@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
-import { fetchModerationQueue, fetchStations, publishReport, rejectReport } from "../api";
+import { fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport } from "../api";
 import type { EventType, ReportFeature, Station } from "../types";
 import { flagLabel, formatExtra, gradeLabel } from "../utils";
 import "./ModerationPanel.css";
 
 const TOKEN_KEY = "fuelwatch-mod-token";
 const MOD_ID_KEY = "fuelwatch-mod-id";
+
+type Tab = "queue" | "published" | "rejected";
 
 interface Props {
   eventTypeMap: Record<string, EventType>;
@@ -16,10 +18,13 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
   const [token, setToken] = useState(() => sessionStorage.getItem(TOKEN_KEY) ?? "");
   const [moderatorId, setModeratorId] = useState(() => sessionStorage.getItem(MOD_ID_KEY) ?? "moderator");
   const [queue, setQueue] = useState<ReportFeature[]>([]);
+  const [published, setPublished] = useState<ReportFeature[]>([]);
+  const [rejected, setRejected] = useState<ReportFeature[]>([]);
   const [stations, setStations] = useState<Record<number, Station>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [authenticated, setAuthenticated] = useState(false);
+  const [activeTab, setActiveTab] = useState<Tab>("queue");
 
   useEffect(() => {
     fetchStations()
@@ -27,15 +32,20 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
       .catch(() => {});
   }, []);
 
-  const loadQueue = useCallback(async () => {
-    if (!token) return;
+  const loadAll = useCallback(async (tok: string) => {
     setLoading(true);
     setError(null);
     try {
-      const items = await fetchModerationQueue(token);
-      setQueue(items);
+      const [q, pub, rej] = await Promise.all([
+        fetchModerationQueue(tok),
+        fetchPublishedReports(tok),
+        fetchRejectedReports(tok),
+      ]);
+      setQueue(q);
+      setPublished(pub);
+      setRejected(rej);
       setAuthenticated(true);
-      sessionStorage.setItem(TOKEN_KEY, token);
+      sessionStorage.setItem(TOKEN_KEY, tok);
       sessionStorage.setItem(MOD_ID_KEY, moderatorId);
     } catch {
       setAuthenticated(false);
@@ -43,25 +53,24 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
     } finally {
       setLoading(false);
     }
-  }, [token, moderatorId]);
+  }, [moderatorId]);
 
   useEffect(() => {
     const saved = sessionStorage.getItem(TOKEN_KEY);
     if (saved) {
       setToken(saved);
-      fetchModerationQueue(saved)
-        .then((items) => {
-          setQueue(items);
-          setAuthenticated(true);
-        })
-        .catch(() => setAuthenticated(false));
+      loadAll(saved).catch(() => setAuthenticated(false));
     }
   }, []);
 
   const handlePublish = async (id: number) => {
     try {
       await publishReport(token, id, moderatorId);
+      const item = queue.find((r) => r.properties.id === id);
       setQueue((q) => q.filter((r) => r.properties.id !== id));
+      if (item) {
+        setPublished((prev) => [{ ...item, properties: { ...item.properties, status: "published" } }, ...prev]);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка публикации");
     }
@@ -72,7 +81,11 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
     if (!reason) return;
     try {
       await rejectReport(token, id, moderatorId, reason);
+      const item = queue.find((r) => r.properties.id === id);
       setQueue((q) => q.filter((r) => r.properties.id !== id));
+      if (item) {
+        setRejected((prev) => [{ ...item, properties: { ...item.properties, status: "rejected", reject_reason: reason } }, ...prev]);
+      }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка отклонения");
     }
@@ -100,7 +113,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
             onChange={(e) => setModeratorId(e.target.value)}
           />
           {error && <div className="mod-error">{error}</div>}
-          <button className="btn-primary" onClick={loadQueue} disabled={!token || loading}>
+          <button className="btn-primary" onClick={() => loadAll(token)} disabled={!token || loading}>
             {loading ? "Проверка…" : "Войти"}
           </button>
         </div>
@@ -108,16 +121,32 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
     );
   }
 
+  const tabs: { id: Tab; label: string; count: number }[] = [
+    { id: "queue", label: "Очередь", count: queue.length },
+    { id: "published", label: "Опубликованные", count: published.length },
+    { id: "rejected", label: "Удалённые", count: rejected.length },
+  ];
+
+  const activeList = activeTab === "queue" ? queue : activeTab === "published" ? published : rejected;
+
+  const tabLabel = tabs.find((t) => t.id === activeTab)?.label ?? "";
+
   return (
     <div className="mod">
       <div className="msb">
         <div className="mlogo">
           ДОЗОР<span className="acc">.</span>админ
         </div>
-        <div className="msi on">
-          <span>Очередь</span>
-          <span className="mono fs11">{queue.length}</span>
-        </div>
+        {tabs.map((t) => (
+          <button
+            key={t.id}
+            className={`msi${activeTab === t.id ? " on" : ""}`}
+            onClick={() => setActiveTab(t.id)}
+          >
+            <span>{t.label}</span>
+            <span className="mono fs11">{t.count}</span>
+          </button>
+        ))}
         <button className="btn-ghost-sm mod-back" onClick={onClose}>
           ← Карта
         </button>
@@ -125,10 +154,10 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
 
       <div className="mtb">
         <div className="mod-toolbar">
-          <span className="fw6">Очередь проверки</span>
+          <span className="fw6">{tabLabel}</span>
           <div className="mod-header-actions">
             {loading && <span className="status-pill">Обновление…</span>}
-            <button className="btn-ghost-sm" onClick={loadQueue} disabled={loading}>
+            <button className="btn-ghost-sm" onClick={() => loadAll(token)} disabled={loading}>
               ↻
             </button>
           </div>
@@ -136,21 +165,25 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
 
         {error && <div className="mod-error">{error}</div>}
 
-        {queue.length === 0 ? (
-          <div className="mod-empty">Очередь пуста — все отчёты обработаны.</div>
+        {activeList.length === 0 ? (
+          <div className="mod-empty">
+            {activeTab === "queue" ? "Очередь пуста — все отчёты обработаны." : "Нет записей."}
+          </div>
         ) : (
           <div className="mod-table">
-            <div className="mrow mhead">
+            <div className={`mrow mhead${activeTab === "rejected" ? " mrow-rejected" : activeTab === "published" ? " mrow-published" : ""}`}>
               <span>ID</span>
               <span>Тип</span>
               <span>Описание</span>
               <span>Фото</span>
               <span>Автор</span>
               <span>АЗС</span>
-              <span>Флаги</span>
-              <span>Действия</span>
+              {activeTab === "queue" && <span>Флаги</span>}
+              {activeTab === "rejected" && <span>Причина</span>}
+              {activeTab === "published" && <span>Подтверждений</span>}
+              {activeTab === "queue" && <span>Действия</span>}
             </div>
-            {queue.map((r) => {
+            {activeList.map((r) => {
               const p = r.properties;
               const et = eventTypeMap[p.event_type];
               const [lon, lat] = r.geometry.coordinates;
@@ -158,7 +191,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
               const extraLines = formatExtra(p.extra);
 
               return (
-                <div key={p.id} className="mrow">
+                <div key={p.id} className={`mrow${activeTab === "rejected" ? " mrow-rejected" : activeTab === "published" ? " mrow-published" : ""}`}>
                   <span className="mid">#{p.id}</span>
                   <span>
                     <span className="ebadge" style={{ "--c": et?.color } as React.CSSProperties}>
@@ -180,29 +213,31 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
                   </span>
                   <span className="nick">{p.nickname}</span>
                   <span className="mstation">
-                    {station
-                      ? station.name
-                      : `${lat.toFixed(4)}, ${lon.toFixed(4)}`}
+                    {station ? station.name : `${lat.toFixed(4)}, ${lon.toFixed(4)}`}
                   </span>
-                  <span className="mflags">
-                    {p.review_flags && p.review_flags.length > 0 ? (
-                      p.review_flags.map((f) => (
-                        <span key={f} className="flag">
-                          {flagLabel(f)}
-                        </span>
-                      ))
-                    ) : (
-                      <span className="mut">—</span>
-                    )}
-                  </span>
-                  <span className="mactions">
-                    <button className="abtn y" onClick={() => handlePublish(p.id)} title="Опубликовать">
-                      ✓
-                    </button>
-                    <button className="abtn n" onClick={() => handleReject(p.id)} title="Отклонить">
-                      ✕
-                    </button>
-                  </span>
+                  {activeTab === "queue" && (
+                    <span className="mflags">
+                      {p.review_flags && p.review_flags.length > 0 ? (
+                        p.review_flags.map((f) => (
+                          <span key={f} className="flag">{flagLabel(f)}</span>
+                        ))
+                      ) : (
+                        <span className="mut">—</span>
+                      )}
+                    </span>
+                  )}
+                  {activeTab === "rejected" && (
+                    <span className="mreject-reason">{p.reject_reason ?? "—"}</span>
+                  )}
+                  {activeTab === "published" && (
+                    <span className="mconfirm">{p.confirmations_count}</span>
+                  )}
+                  {activeTab === "queue" && (
+                    <span className="mactions">
+                      <button className="abtn y" onClick={() => handlePublish(p.id)} title="Опубликовать">✓</button>
+                      <button className="abtn n" onClick={() => handleReject(p.id)} title="Отклонить">✕</button>
+                    </span>
+                  )}
                 </div>
               );
             })}

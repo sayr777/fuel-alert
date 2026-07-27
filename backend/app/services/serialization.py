@@ -31,5 +31,7 @@ async def report_to_feature(session: AsyncSession, report: Report) -> ReportFeat
             photos=photos,
             confirmations_count=report.confirmations_count,
             review_flags=report.review_flags,
+            status=report.status,
+            reject_reason=report.reject_reason,
         ),
     )

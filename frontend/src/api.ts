@@ -50,6 +50,16 @@ export function fetchModerationQueue(token: string): Promise<ReportFeature[]> {
   return fetchJson("/moderation/queue", { headers: moderatorHeaders(token) });
 }
 
+export function fetchPublishedReports(token: string): Promise<ReportFeature[]> {
+  if (USE_MOCKS) return mockApi.mockFetchPublishedReports(token);
+  return fetchJson("/moderation/published", { headers: moderatorHeaders(token) });
+}
+
+export function fetchRejectedReports(token: string): Promise<ReportFeature[]> {
+  if (USE_MOCKS) return mockApi.mockFetchRejectedReports(token);
+  return fetchJson("/moderation/rejected", { headers: moderatorHeaders(token) });
+}
+
 export async function publishReport(
   token: string,
   reportId: number,

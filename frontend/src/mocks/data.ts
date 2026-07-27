@@ -258,7 +258,7 @@ export const MOCK_MODERATION_QUEUE: ReportFeature[] = [
       id: 11, event_type: "ILLEGAL_SALE", fuel_grades: null,
       description: "Продажа канистрами у обочины М-11, без лицензии",
       price: null, extra: null, event_at: h(0.2), nickname: "Водитель-9901", station_id: null,
-      photos: [], confirmations_count: 0, review_flags: null,
+      photos: [], confirmations_count: 0, review_flags: null, status: "pending", reject_reason: null,
     },
   },
   {
@@ -268,7 +268,7 @@ export const MOCK_MODERATION_QUEUE: ReportFeature[] = [
       id: 12, event_type: "NO_FUEL", fuel_grades: ["AI95", "AI100"],
       description: "95-го и 100-го нет с самого утра, только ДТ",
       price: null, extra: null, event_at: h(0.5), nickname: "Водитель-2287", station_id: 1,
-      photos: [], confirmations_count: 5, review_flags: null,
+      photos: [], confirmations_count: 5, review_flags: null, status: "pending", reject_reason: null,
     },
   },
   {
@@ -278,7 +278,7 @@ export const MOCK_MODERATION_QUEUE: ReportFeature[] = [
       id: 13, event_type: "FAKE_FUEL", fuel_grades: ["AI92"],
       description: "После заправки двигатель троит, подозрение на разбавленный 92-й",
       price: null, extra: null, event_at: h(4), nickname: "Водитель-6120", station_id: null,
-      photos: [], confirmations_count: 1, review_flags: ["exif_gps_mismatch"],
+      photos: [], confirmations_count: 1, review_flags: ["exif_gps_mismatch"], status: "pending", reject_reason: null,
     },
   },
   {
@@ -288,7 +288,63 @@ export const MOCK_MODERATION_QUEUE: ReportFeature[] = [
       id: 22, event_type: "ILLEGAL_SALE", fuel_grades: null,
       description: "Продажа топлива из канистр у обочины А-108, без лицензии",
       price: null, extra: null, event_at: h(0.3), nickname: "Водитель-1300", station_id: null,
-      photos: [], confirmations_count: 0, review_flags: null,
+      photos: [], confirmations_count: 0, review_flags: null, status: "pending", reject_reason: null,
+    },
+  },
+];
+
+export const MOCK_PUBLISHED: ReportFeature[] = [
+  {
+    type: "Feature",
+    geometry: { type: "Point", coordinates: [158.628, 53.045] },
+    properties: {
+      id: 1, event_type: "NO_FUEL", fuel_grades: ["AI95", "DT"],
+      description: "На всех колонках табличка «топливо закончилось»",
+      price: null, extra: null, event_at: h(2), nickname: "Водитель-4821", station_id: 1,
+      photos: [], confirmations_count: 4, review_flags: null, status: "published", reject_reason: null,
+    },
+  },
+  {
+    type: "Feature",
+    geometry: { type: "Point", coordinates: [37.617, 54.193] },
+    properties: {
+      id: 2, event_type: "OVERPRICE", fuel_grades: ["AI95"],
+      description: "Цена 95-го выросла до 85 руб/л",
+      price: 85.0, extra: null, event_at: h(6), nickname: "Водитель-3310", station_id: 13,
+      photos: [], confirmations_count: 2, review_flags: null, status: "published", reject_reason: null,
+    },
+  },
+  {
+    type: "Feature",
+    geometry: { type: "Point", coordinates: [158.602, 53.058] },
+    properties: {
+      id: 3, event_type: "SHORT_MEASURE", fuel_grades: ["AI95"],
+      description: "Не долили около 2 литров на 50-литровой заправке",
+      price: null, extra: { pump_number: "3" }, event_at: h(12), nickname: "Водитель-5521", station_id: 3,
+      photos: [], confirmations_count: 3, review_flags: ["exif_gps_mismatch"], status: "published", reject_reason: null,
+    },
+  },
+];
+
+export const MOCK_REJECTED: ReportFeature[] = [
+  {
+    type: "Feature",
+    geometry: { type: "Point", coordinates: [158.655, 53.018] },
+    properties: {
+      id: 5, event_type: "FRAUD", fuel_grades: null,
+      description: "Недостаточно доказательств",
+      price: null, extra: null, event_at: h(24), nickname: "Водитель-0011", station_id: null,
+      photos: [], confirmations_count: 0, review_flags: null, status: "rejected", reject_reason: "Недостаточно доказательств для публикации",
+    },
+  },
+  {
+    type: "Feature",
+    geometry: { type: "Point", coordinates: [37.45, 55.90] },
+    properties: {
+      id: 6, event_type: "ILLEGAL_SALE", fuel_grades: null,
+      description: "Обычная сезонная торговля, не нарушение",
+      price: null, extra: null, event_at: h(36), nickname: "Водитель-7742", station_id: null,
+      photos: [], confirmations_count: 0, review_flags: null, status: "rejected", reject_reason: "Не является нарушением",
     },
   },
 ];

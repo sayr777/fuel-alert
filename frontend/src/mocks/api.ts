@@ -3,6 +3,8 @@ import {
   MOCK_EVENT_TYPES,
   MOCK_FUEL_GRADES,
   MOCK_MODERATION_QUEUE,
+  MOCK_PUBLISHED,
+  MOCK_REJECTED,
   MOCK_REPORTS,
   MOCK_STATIONS,
 } from "./data";
@@ -70,4 +72,14 @@ export async function mockRejectReport(reportId: number): Promise<void> {
   await delay();
   const idx = MOCK_MODERATION_QUEUE.findIndex((r) => r.properties.id === reportId);
   if (idx >= 0) MOCK_MODERATION_QUEUE.splice(idx, 1);
+}
+
+export async function mockFetchPublishedReports(_token: string): Promise<ReportFeature[]> {
+  await delay();
+  return [...MOCK_PUBLISHED];
+}
+
+export async function mockFetchRejectedReports(_token: string): Promise<ReportFeature[]> {
+  await delay();
+  return [...MOCK_REJECTED];
 }

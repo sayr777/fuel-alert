@@ -31,6 +31,16 @@
   border-radius: 8px;
   color: var(--text-muted);
   font-size: 13px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+}
+
+.msi:hover {
+  background: var(--surface-hover);
+  color: var(--text);
 }
 
 .msi.on {
@@ -143,6 +153,14 @@
   border-bottom: 1px solid var(--border);
   font-size: 12.5px;
   color: var(--text);
+}
+
+.mrow.mrow-published {
+  grid-template-columns: 60px 170px 1fr 80px 130px 150px 100px;
+}
+
+.mrow.mrow-rejected {
+  grid-template-columns: 60px 170px 1fr 80px 130px 150px 1fr;
 }
 
 .mhead {
@@ -282,13 +300,34 @@
   background: rgba(255, 75, 62, 0.24);
 }
 
+.mreject-reason {
+  color: #ff8a80;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mconfirm {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--success);
+  font-weight: 600;
+}
+
 @media (max-width: 1000px) {
   .mrow {
     grid-template-columns: 50px 140px 1fr 96px;
   }
+  .mrow.mrow-published,
+  .mrow.mrow-rejected {
+    grid-template-columns: 50px 140px 1fr 96px;
+  }
   .mstation,
   .mflags,
-  .mphotos {
+  .mphotos,
+  .mreject-reason,
+  .mconfirm {
     display: none;
   }
 }

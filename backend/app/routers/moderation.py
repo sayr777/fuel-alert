@@ -22,6 +22,22 @@ async def moderation_queue(session: AsyncSession = Depends(get_session)) -> list
     return [await report_to_feature(session, r) for r in reports]
 
 
+@router.get("/published", response_model=list[ReportFeature])
+async def moderation_published(session: AsyncSession = Depends(get_session)) -> list[ReportFeature]:
+    stmt = select(Report).where(Report.status == "published").order_by(Report.created_at.desc()).limit(500)
+    result = await session.execute(stmt)
+    reports = result.scalars().all()
+    return [await report_to_feature(session, r) for r in reports]
+
+
+@router.get("/rejected", response_model=list[ReportFeature])
+async def moderation_rejected(session: AsyncSession = Depends(get_session)) -> list[ReportFeature]:
+    stmt = select(Report).where(Report.status == "rejected").order_by(Report.created_at.desc()).limit(500)
+    result = await session.execute(stmt)
+    reports = result.scalars().all()
+    return [await report_to_feature(session, r) for r in reports]
+
+
 @router.post("/{report_id}/publish")
 async def publish_report(
     report_id: int,
