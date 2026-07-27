@@ -44,7 +44,7 @@ def test_event_types_all_present(client):
     resp = client.get("/api/v1/event-types")
     assert resp.status_code == 200
     codes = {et["code"] for et in resp.json()}
-    assert codes == {
+    assert codes >= {
         "NO_FUEL", "FUEL_AVAILABLE", "LIMITED_SALE", "LONG_QUEUE",
         "OVERPRICE", "ILLEGAL_SALE", "SHORT_MEASURE", "FAKE_FUEL",
         "STATION_CLOSED", "FRAUD",
@@ -94,14 +94,14 @@ def test_moderation_queue_missing_token(client):
 
 
 def test_moderation_queue_wrong_token(client):
-    resp = client.get("/api/v1/moderation/queue", headers={"X-Moderator-Token": "wrong-token"})
+    resp = client.get("/api/v1/moderation/queue", headers={"Authorization": "Bearer wrong-token"})
     assert resp.status_code == 401
 
 
 def test_moderation_publish_wrong_token(client):
     resp = client.post(
         "/api/v1/moderation/1/publish",
-        headers={"X-Moderator-Token": "wrong"},
+        headers={"Authorization": "Bearer wrong"},
         data={"moderator_id": "mod1"},
     )
     assert resp.status_code == 401

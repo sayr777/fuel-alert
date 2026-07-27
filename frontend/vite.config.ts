@@ -9,4 +9,13 @@ export default defineConfig({
       "/api": "http://localhost:8000",
     },
   },
+  test: {
+    environment: "jsdom",
+    globals: true,
+    setupFiles: ["./src/test-setup.ts"],
+    env: {
+      VITE_USE_MOCKS: "true",
+    },
+    exclude: ["node_modules", "dist", "../e2e/**"],
+  },
 });
