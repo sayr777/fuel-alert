@@ -15,14 +15,28 @@ fi
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Telegram unreachable, reconnecting VPN..."
 
-adguardvpn-cli disconnect || true
-sleep 3
-adguardvpn-cli connect -l "Vilnius"
-sleep 5
-
-if telegram_reachable; then
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Telegram reachable, restarting bot"
-    sudo docker compose -f /opt/fuel-alert/deploy/docker-compose.yml restart bot
-else
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARNING: Telegram still unreachable after reconnect"
+# If daemon is not running — start it first
+if ! adguardvpn-cli status 2>/dev/null | grep -qE "Connected|Disconnected"; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] VPN daemon not running, starting daemon..."
+    adguardvpn-cli start || true
+    sleep 8
 fi
+
+adguardvpn-cli disconnect 2>/dev/null || true
+sleep 3
+
+# Try Amsterdam first (more reliable), fallback to Vilnius
+for LOCATION in "Amsterdam" "Vilnius" "Frankfurt"; do
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] Trying location: $LOCATION"
+    adguardvpn-cli connect -l "$LOCATION" || true
+    sleep 6
+    if telegram_reachable; then
+        echo "[$(date '+%Y-%m-%d %H:%M:%S')] Telegram reachable via $LOCATION, restarting bot"
+        sudo docker compose -f /opt/fuel-alert/deploy/docker-compose.yml restart bot
+        exit 0
+    fi
+    adguardvpn-cli disconnect 2>/dev/null || true
+    sleep 2
+done
+
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] WARNING: Telegram still unreachable after trying all locations"
