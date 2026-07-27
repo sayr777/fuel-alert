@@ -96,4 +96,20 @@ describe("ModerationPanel — authenticated (mocks)", () => {
     const dateInputs = document.querySelectorAll('input[type="date"]');
     expect(dateInputs.length).toBeGreaterThan(0);
   });
+
+  it("monitoring tab shows log viewer with container tabs", async () => {
+    const user = userEvent.setup();
+    await renderAuthenticated();
+    await user.click(screen.getByRole("button", { name: /Мониторинг/ }));
+    await waitFor(() => {
+      screen.getByText(/База данных/);
+    }, { timeout: 3000 });
+    // Log viewer appears once containers are loaded from mock health data
+    await waitFor(() => {
+      expect(document.querySelector(".log-viewer")).toBeTruthy();
+    }, { timeout: 3000 });
+    // Each container becomes a tab in the log viewer
+    const logTabs = document.querySelectorAll(".log-tab");
+    expect(logTabs.length).toBeGreaterThan(0);
+  });
 });

@@ -125,6 +125,61 @@ CARTO с ограничениями по нагрузке — рассмотре
 
 В локальном `docker-compose.yml` `api-init` вызывает все три: `init_db.py` + `seed_demo.py` + `seed_stations.py`. В продовом `deploy/docker-compose.yml` — только `init_db.py` (демо-данные на проде не нужны).
 
+## Резервное копирование
+
+Скрипт `deploy/backup.sh` запускается из crontab пользователя `sayr777`:
+
+```
+0 3 * * * /opt/fuel-alert/deploy/backup.sh
+```
+
+Что сохраняется:
+- **PostgreSQL**: `pg_dump` → gzip → `s3://fuel-alert-backups/db/db_YYYYMMDD.sql.gz`, ротация 30 дней
+- **Фото**: инкрементальная синхронизация `s3://fuel-watch-photos/` → `s3://fuel-alert-backups/photos/`
+- **Логи**: `/var/log/fuel-alert-backup.log`
+
+### Первичная настройка (выполнено 2026-07-28)
+
+```bash
+# 1. AWS CLI v2 (apt не работает на Ubuntu 24.04)
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o /tmp/awscliv2.zip
+sudo apt install -y unzip && unzip -q /tmp/awscliv2.zip -d /tmp
+sudo /tmp/aws/install
+
+# 2. Добавить BACKUP_BUCKET в .env (файл root-owned)
+echo "BACKUP_BUCKET=fuel-alert-backups" | sudo tee -a /opt/fuel-alert/deploy/.env
+
+# 3. Создать лог-файл с правами записи
+sudo touch /var/log/fuel-alert-backup.log && sudo chmod 666 /var/log/fuel-alert-backup.log
+
+# 4. Выдать скрипту права (сбрасываются после git reset --hard)
+sudo chmod +x /opt/fuel-alert/deploy/backup.sh
+
+# 5. Добавить в crontab пользователя (не root!)
+crontab -e    # 0 3 * * * /opt/fuel-alert/deploy/backup.sh
+
+# 6. Проверить
+/opt/fuel-alert/deploy/backup.sh && tail -20 /var/log/fuel-alert-backup.log
+```
+
+> ⚠️ `backup.sh` теряет бит исполнения после `git reset --hard` — после каждого деплоя повторяй `sudo chmod +x`.
+
+### Восстановление БД
+
+```bash
+aws s3 ls s3://fuel-alert-backups/db/ --endpoint-url https://storage.yandexcloud.net
+aws s3 cp s3://fuel-alert-backups/db/db_20260727.sql.gz /tmp/ \
+  --endpoint-url https://storage.yandexcloud.net
+gunzip -c /tmp/db_20260727.sql.gz | sudo docker exec -i deploy-db-1 psql -U fuelwatch fuelwatch
+```
+
+### Восстановление фото
+
+```bash
+aws s3 sync s3://fuel-alert-backups/photos/ s3://fuel-watch-photos/ \
+  --endpoint-url https://storage.yandexcloud.net
+```
+
 ## VPN (Yandex Cloud → Telegram)
 
 Yandex Cloud блокирует исходящие соединения к серверам Telegram. Для работы бота нужен VPN.

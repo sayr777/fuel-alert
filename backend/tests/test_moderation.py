@@ -173,3 +173,32 @@ def test_health_redis_error_still_200(client):
 
     assert r.status_code == 200
     assert r.json()["redis"]["status"] == "error"
+
+
+# ── container logs ───────────────────────────────────────────────────────────
+
+def test_logs_no_socket(client):
+    with patch("os.path.exists", return_value=False):
+        r = client.get("/api/v1/moderation/logs/deploy-api-1", headers=AUTH)
+    assert r.status_code == 200
+    assert r.json() == ["[docker socket not available]"]
+
+
+def test_logs_with_socket(client):
+    with (
+        patch("os.path.exists", return_value=True),
+        patch("app.routers.moderation._fetch_docker_logs", return_value=["line1", "line2 ERROR"]),
+    ):
+        r = client.get("/api/v1/moderation/logs/deploy-api-1", headers=AUTH)
+    assert r.status_code == 200
+    assert r.json() == ["line1", "line2 ERROR"]
+
+
+def test_logs_socket_error(client):
+    with (
+        patch("os.path.exists", return_value=True),
+        patch("app.routers.moderation._fetch_docker_logs", side_effect=RuntimeError("conn refused")),
+    ):
+        r = client.get("/api/v1/moderation/logs/deploy-api-1", headers=AUTH)
+    assert r.status_code == 200
+    assert r.json()[0].startswith("[error:")
