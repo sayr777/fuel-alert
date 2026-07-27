@@ -212,3 +212,44 @@ async def _check_docker() -> list[dict]:
         return await asyncio.to_thread(_docker_sync)
     except Exception as e:
         return [{"name": "docker", "status": f"error: {e}", "running": False}]
+
+
+# ── container logs ────────────────────────────────────────────────────────────
+
+@router.get("/logs/{container}")
+async def container_logs(container: str, tail: int = 100) -> list[str]:
+    import os
+    if not os.path.exists(DOCKER_SOCKET):
+        return ["[docker socket not available]"]
+    try:
+        return await asyncio.to_thread(_fetch_docker_logs, container, tail)
+    except Exception as e:
+        return [f"[error: {e}]"]
+
+
+def _fetch_docker_logs(container: str, tail: int) -> list[str]:
+    conn = _UnixHTTPConn(DOCKER_SOCKET)
+    conn.request(
+        "GET",
+        f"/v1.43/containers/{container}/logs?stdout=1&stderr=1&tail={tail}&timestamps=0&follow=0",
+    )
+    resp = conn.getresponse()
+    raw = resp.read()
+    conn.close()
+    lines: list[str] = []
+    i = 0
+    while i < len(raw):
+        if i + 8 > len(raw):
+            break
+        frame_size = int.from_bytes(raw[i + 4: i + 8], "big")
+        i += 8
+        if frame_size == 0:
+            continue
+        if i + frame_size > len(raw):
+            break
+        chunk = raw[i: i + frame_size].decode("utf-8", errors="replace")
+        for line in chunk.splitlines():
+            if line:
+                lines.append(line)
+        i += frame_size
+    return lines

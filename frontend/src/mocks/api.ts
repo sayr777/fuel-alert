@@ -96,6 +96,19 @@ export async function mockRestoreReport(reportId: number): Promise<void> {
   if (idx >= 0) MOCK_REJECTED.splice(idx, 1);
 }
 
+export async function mockFetchContainerLogs(container: string): Promise<string[]> {
+  await delay();
+  const ts = new Date().toLocaleTimeString("ru");
+  return [
+    `[${ts}] INFO: ${container} started`,
+    `[${ts}] INFO: listening on port 8000`,
+    `[${ts}] INFO: GET /api/v1/reports 200 OK 12ms`,
+    `[${ts}] INFO: GET /api/v1/stations 200 OK 5ms`,
+    `[${ts}] WARN: slow query detected 450ms`,
+    `[${ts}] INFO: GET /api/v1/moderation/health 200 OK 8ms`,
+  ];
+}
+
 export async function mockFetchHealthStatus(): Promise<HealthStatus> {
   await delay();
   return {

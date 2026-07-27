@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchHealthStatus, fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport, restoreReport, unpublishReport } from "../api";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { fetchContainerLogs, fetchHealthStatus, fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport, restoreReport, unpublishReport } from "../api";
 import type { ContainerStatus, EventType, HealthStatus, ReportFeature, ServiceHealth, Station } from "../types";
 import { flagLabel, formatExtra, gradeLabel } from "../utils";
 import "./ModerationPanel.css";
@@ -211,7 +211,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
         {error && <div className="mod-error">{error}</div>}
 
         {activeTab === "monitoring" && (
-          <MonitoringTab health={health} loading={healthLoading} onRefresh={loadHealth} />
+          <MonitoringTab health={health} loading={healthLoading} onRefresh={loadHealth} token={token} />
         )}
 
         {activeTab !== "monitoring" && (activeList.length === 0 ? (
@@ -329,38 +329,122 @@ function ContainerRow({ c }: { c: ContainerStatus }) {
   );
 }
 
-function MonitoringTab({ health, loading, onRefresh }: { health: HealthStatus | null; loading: boolean; onRefresh: () => void }) {
+function MonitoringTab({ health, loading, onRefresh, token }: { health: HealthStatus | null; loading: boolean; onRefresh: () => void; token: string }) {
   return (
     <div className="mon-wrap">
-      <div className="mon-header">
-        <span className="fw6">Статус сервисов</span>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {health && <span className="mut" style={{ fontSize: 11 }}>обновлено {new Date(health.timestamp).toLocaleTimeString("ru")}</span>}
-          <button className="btn-ghost-sm" onClick={onRefresh} disabled={loading}>
-            {loading ? "…" : "↻"}
-          </button>
+      <div className="mon-status-area">
+        <div className="mon-header">
+          <span className="fw6">Статус сервисов</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {health && <span className="mut" style={{ fontSize: 11 }}>обновлено {new Date(health.timestamp).toLocaleTimeString("ru")}</span>}
+            <button className="btn-ghost-sm" onClick={onRefresh} disabled={loading}>
+              {loading ? "…" : "↻"}
+            </button>
+          </div>
         </div>
+
+        {loading && !health && <div className="mod-empty">Проверяем сервисы…</div>}
+
+        {health && (
+          <>
+            <div className="mon-section-label">Компоненты</div>
+            <div className="svc-grid">
+              <SvcCard label="База данных" svc={health.database} />
+              <SvcCard label="Redis" svc={health.redis} />
+              <SvcCard label="Telegram / VPN" svc={health.telegram} />
+            </div>
+
+            <div className="mon-section-label">Контейнеры</div>
+            <div className="ctr-list">
+              {health.containers.map((c) => (
+                <ContainerRow key={c.name} c={c} />
+              ))}
+            </div>
+          </>
+        )}
       </div>
 
-      {loading && !health && <div className="mod-empty">Проверяем сервисы…</div>}
-
-      {health && (
-        <>
-          <div className="mon-section-label">Компоненты</div>
-          <div className="svc-grid">
-            <SvcCard label="База данных" svc={health.database} />
-            <SvcCard label="Redis" svc={health.redis} />
-            <SvcCard label="Telegram / VPN" svc={health.telegram} />
-          </div>
-
-          <div className="mon-section-label">Контейнеры</div>
-          <div className="ctr-list">
-            {health.containers.map((c) => (
-              <ContainerRow key={c.name} c={c} />
-            ))}
-          </div>
-        </>
+      {health && health.containers.length > 0 && (
+        <div className="mon-logs-area">
+          <div className="mon-section-label" style={{ marginTop: 28 }}>Логи контейнеров</div>
+          <LogViewer token={token} containers={health.containers} />
+        </div>
       )}
+    </div>
+  );
+}
+
+// ── Log viewer ────────────────────────────────────────────────────────────────
+
+function shortName(name: string) {
+  return name.replace(/^deploy-/, "").replace(/-\d+$/, "");
+}
+
+function logLineClass(line: string): string {
+  const l = line.toLowerCase();
+  if (/error|exception|critical|traceback/.test(l)) return "log-line-err";
+  if (/warn/.test(l)) return "log-line-warn";
+  return "";
+}
+
+function LogViewer({ token, containers }: { token: string; containers: ContainerStatus[] }) {
+  const [active, setActive] = useState<string>(containers[0]?.name ?? "");
+  const [logs, setLogs] = useState<Record<string, string[] | undefined>>({});
+  const [loadingName, setLoadingName] = useState<string | null>(null);
+  const termRef = useRef<HTMLDivElement>(null);
+
+  const load = useCallback(async (name: string) => {
+    setLoadingName(name);
+    try {
+      const lines = await fetchContainerLogs(token, name);
+      setLogs((prev) => ({ ...prev, [name]: lines }));
+    } catch {
+      setLogs((prev) => ({ ...prev, [name]: ["[ошибка загрузки логов]"] }));
+    } finally {
+      setLoadingName(null);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    if (active && logs[active] === undefined) load(active);
+  }, [active, logs, load]);
+
+  useEffect(() => {
+    if (termRef.current) termRef.current.scrollTop = termRef.current.scrollHeight;
+  }, [logs[active]]);
+
+  const lines = logs[active];
+  const isLoading = loadingName === active;
+
+  return (
+    <div className="log-viewer">
+      <div className="log-tabs">
+        {containers.map((c) => (
+          <button
+            key={c.name}
+            className={`log-tab${active === c.name ? " on" : ""}${!c.running ? " dim" : ""}`}
+            onClick={() => setActive(c.name)}
+            title={c.status}
+          >
+            {shortName(c.name)}
+          </button>
+        ))}
+        <button
+          className="log-tab-refresh"
+          onClick={() => load(active)}
+          disabled={loadingName !== null}
+          title="Обновить логи"
+        >
+          {isLoading ? "…" : "↻"}
+        </button>
+      </div>
+      <div className="log-terminal" ref={termRef}>
+        {isLoading && !lines && <span className="log-muted">Загрузка…</span>}
+        {!isLoading && lines?.length === 0 && <span className="log-muted">(нет логов)</span>}
+        {lines?.map((line, i) => (
+          <div key={i} className={`log-line ${logLineClass(line)}`}>{line}</div>
+        ))}
+      </div>
     </div>
   );
 }

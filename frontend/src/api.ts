@@ -119,6 +119,13 @@ export function fetchHealthStatus(token: string): Promise<HealthStatus> {
   return fetchJson("/moderation/health", { headers: moderatorHeaders(token) });
 }
 
+export function fetchContainerLogs(token: string, container: string, tail = 100): Promise<string[]> {
+  if (USE_MOCKS) return mockApi.mockFetchContainerLogs(container);
+  return fetchJson(`/moderation/logs/${encodeURIComponent(container)}?tail=${tail}`, {
+    headers: moderatorHeaders(token),
+  });
+}
+
 export async function restoreReport(
   token: string,
   reportId: number,
