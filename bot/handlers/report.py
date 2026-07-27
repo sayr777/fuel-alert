@@ -110,11 +110,16 @@ async def photos_skip(message: Message, state: FSMContext) -> None:
     await _ask_comment(message, state)
 
 
-@router.message(ReportFlow.entering_description)
+@router.message(ReportFlow.entering_description, F.text)
 async def on_description(message: Message, state: FSMContext) -> None:
     await state.update_data(description=message.text.strip())
     await state.set_state(ReportFlow.waiting_location)
     await message.answer("📍 Отправьте геолокацию АЗС:", reply_markup=location_keyboard())
+
+
+@router.message(ReportFlow.entering_description)
+async def on_description_wrong_type(message: Message) -> None:
+    await message.answer("Пожалуйста, напишите описание текстом.")
 
 
 @router.message(ReportFlow.entering_comment, F.text == "⏭ Без комментария")
@@ -122,10 +127,15 @@ async def comment_skip(message: Message, state: FSMContext) -> None:
     await _show_confirmation(message, state)
 
 
-@router.message(ReportFlow.entering_comment)
+@router.message(ReportFlow.entering_comment, F.text)
 async def on_comment(message: Message, state: FSMContext) -> None:
     await state.update_data(description=message.text.strip())
     await _show_confirmation(message, state)
+
+
+@router.message(ReportFlow.entering_comment)
+async def on_comment_wrong_type(message: Message) -> None:
+    await message.answer("Пожалуйста, напишите комментарий текстом или нажмите «⏭ Без комментария».")
 
 
 @router.callback_query(ReportFlow.confirming, F.data == "confirm:send")
