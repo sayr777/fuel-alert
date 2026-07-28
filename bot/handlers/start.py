@@ -17,6 +17,7 @@ async def cmd_start(message: Message, state: FSMContext, api: ApiClient) -> None
     await message.answer(
         f"Привет, {name}! 👋\n\n"
         "Я помогаю водителям делиться информацией о топливе на АЗС.\n\n"
+        "🗺 Карта сообщений: https://dozor-fuel.online\n\n"
         "Нажмите «📢 Сообщить о ситуации», чтобы отправить отчёт.",
         reply_markup=main_menu_keyboard(),
     )
@@ -33,5 +34,6 @@ async def cmd_help(message: Message) -> None:
         "4. Отправьте геолокацию АЗС\n"
         "5. При желании прикрепите фото (как файл — так сохранится EXIF)\n"
         "6. Подтвердите отправку\n\n"
-        "Отчёты появляются на карте после проверки (если требуется модерация)."
+        "Отчёты появляются на карте после проверки (если требуется модерация).\n\n"
+        "🗺 Карта: https://dozor-fuel.online"
     )
