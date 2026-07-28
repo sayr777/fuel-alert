@@ -90,6 +90,38 @@
   border: 1px solid var(--border);
 }
 
+@media (max-width: 520px) {
+  .overlay-header {
+    flex-wrap: wrap;
+    padding: 10px 12px 8px;
+    gap: 6px;
+  }
+
+  .header-brand p {
+    display: none;
+  }
+
+  .logo-badge {
+    width: 32px;
+    height: 32px;
+    font-size: 17px;
+    border-radius: 8px;
+  }
+
+  .header-brand h1 {
+    font-size: 14px;
+  }
+
+  .header-brand {
+    gap: 8px;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+}
+
 .error-banner {
   position: absolute;
   bottom: 24px;
