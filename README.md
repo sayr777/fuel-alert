@@ -28,17 +28,20 @@
 
 | Компонент | Технологии |
 |---|---|
-| Backend | FastAPI, PostgreSQL/PostGIS, Redis |
-| Bot (Telegram) | Python, aiogram 3, FSM |
-| Bot (MAX) | Python, aiohttp, Redis FSM |
+| Backend API | FastAPI, SQLAlchemy async, PostgreSQL/PostGIS, Redis |
+| Bot (Telegram) | Python 3.12, aiogram 3, FSM, Redis |
+| Bot (MAX) | Python 3.12, aiohttp, Redis FSM (без SDK) |
 | Frontend | React 18, TypeScript, Vite, MapLibre GL |
-| Инфраструктура | Docker, Yandex Cloud, Yandex Object Storage |
+| Хранилище фото | Yandex Object Storage (прод) / MinIO (локально) |
+| Инфраструктура | Docker Compose, Yandex Cloud VM, Cloudflare CDN |
 
 ## Быстрый старт
 
 ```bash
-cp .env.example .env          # заполнить BOT_TOKEN
-docker compose up -d          # PostgreSQL, Redis, MinIO, API
+cp .env.example .env                        # заполнить BOT_TOKEN (и MAX_BOT_TOKEN опционально)
+docker compose up -d                        # PostgreSQL, Redis, MinIO, API
+docker compose --profile bot up -d          # + Telegram-бот
+docker compose --profile bot_max up -d      # + MAX-бот
 cd frontend && npm install && npm run dev   # фронтенд с моками: http://localhost:5173
 ```
 
