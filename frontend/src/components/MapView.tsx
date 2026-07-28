@@ -159,7 +159,7 @@ export default function MapView({ reports, stations, eventTypeMap, onBboxChange 
       zoom: r.zoom,
       attributionControl: false,
     });
-    map.addControl(new maplibregl.AttributionControl({ compact: true }), "bottom-right");
+    map.addControl(new maplibregl.AttributionControl({ compact: false }), "bottom-right");
     map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
 
     const emitBbox = () => {
