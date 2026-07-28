@@ -25,7 +25,7 @@ EVENT_TYPES: dict[str, EventTypeDef] = {
         label_ru="Топливо отсутствует",
         color="#FF4B3E",
         requires_moderation=False,
-        ttl_hours=24,
+        ttl_hours=24 * 5,
         attributes=["fuel_grades"],
     ),
     "FUEL_AVAILABLE": EventTypeDef(
@@ -33,7 +33,7 @@ EVENT_TYPES: dict[str, EventTypeDef] = {
         label_ru="Топливо появилось / в наличии",
         color="#3DDC84",
         requires_moderation=False,
-        ttl_hours=12,
+        ttl_hours=24 * 5,
         attributes=["fuel_grades", "price"],
     ),
     "LIMITED_SALE": EventTypeDef(
@@ -41,7 +41,7 @@ EVENT_TYPES: dict[str, EventTypeDef] = {
         label_ru="Ограничение отпуска (лимит в одни руки)",
         color="#FFB020",
         requires_moderation=False,
-        ttl_hours=24,
+        ttl_hours=24 * 5,
         attributes=["fuel_grades", "limit_liters"],
     ),
     "LONG_QUEUE": EventTypeDef(
@@ -49,7 +49,7 @@ EVENT_TYPES: dict[str, EventTypeDef] = {
         label_ru="Большая очередь на АЗС",
         color="#5B8CFF",
         requires_moderation=False,
-        ttl_hours=6,
+        ttl_hours=24 * 5,
         attributes=["wait_minutes"],
     ),
     "OVERPRICE": EventTypeDef(
@@ -57,7 +57,7 @@ EVENT_TYPES: dict[str, EventTypeDef] = {
         label_ru="Завышенная цена",
         color="#FF7A1A",
         requires_moderation=False,
-        ttl_hours=48,
+        ttl_hours=24 * 5,
         attributes=["fuel_grades", "price"],
     ),
     "ILLEGAL_SALE": EventTypeDef(
@@ -89,7 +89,7 @@ EVENT_TYPES: dict[str, EventTypeDef] = {
         label_ru="АЗС закрыта / не работает",
         color="#8A939E",
         requires_moderation=False,
-        ttl_hours=24,
+        ttl_hours=24 * 5,
         attributes=["reason"],
     ),
     "FRAUD": EventTypeDef(
@@ -105,7 +105,7 @@ EVENT_TYPES: dict[str, EventTypeDef] = {
         label_ru="Другое",
         color="#6B7280",
         requires_moderation=True,
-        ttl_hours=24,
+        ttl_hours=24 * 5,
         attributes=["description"],
     ),
 }
