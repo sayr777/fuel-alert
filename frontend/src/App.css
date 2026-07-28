@@ -92,33 +92,41 @@
 
 @media (max-width: 520px) {
   .overlay-header {
-    flex-wrap: wrap;
-    padding: 10px 12px 8px;
-    gap: 6px;
+    padding: 8px 12px;
   }
 
-  .header-brand p {
+  .header-brand-btn {
     display: none;
-  }
-
-  .logo-badge {
-    width: 32px;
-    height: 32px;
-    font-size: 17px;
-    border-radius: 8px;
-  }
-
-  .header-brand h1 {
-    font-size: 14px;
-  }
-
-  .header-brand {
-    gap: 8px;
   }
 
   .header-actions {
     width: 100%;
     justify-content: stretch;
+  }
+}
+
+.mobile-brand-fab {
+  display: none;
+}
+
+@media (max-width: 520px) {
+  .mobile-brand-fab {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: 96px;
+    right: 16px;
+    z-index: 1000;
+    width: 44px;
+    height: 44px;
+    font-size: 22px;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent-hover) 100%);
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 4px 16px rgba(255, 200, 0, 0.4);
+    cursor: pointer;
+    pointer-events: auto;
   }
 }
 

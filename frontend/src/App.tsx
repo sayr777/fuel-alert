@@ -152,6 +152,8 @@ export default function App() {
         </div>
       </header>
 
+      <button className="mobile-brand-fab" onClick={() => setView("landing")}>⛽</button>
+
       <FilterPanel
         eventTypes={eventTypes}
         fuelGrades={fuelGrades}
