@@ -60,24 +60,14 @@
 }
 
 @media (max-width: 520px) {
-  .period-control {
-    width: 100%;
-  }
-
-  .seg-row {
-    width: 100%;
-  }
-
   .segb {
-    flex: 1;
-    padding: 6px 4px;
+    padding: 6px 10px;
     font-size: 11px;
-    text-align: center;
   }
 
   .period-popover {
-    left: 0;
-    right: 0;
+    left: 50%;
+    transform: translateX(-50%);
     flex-direction: column;
   }
 }

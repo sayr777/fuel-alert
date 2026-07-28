@@ -101,7 +101,7 @@
 
   .header-actions {
     width: 100%;
-    justify-content: stretch;
+    justify-content: center;
   }
 }
 
