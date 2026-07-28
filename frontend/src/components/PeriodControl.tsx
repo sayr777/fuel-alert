@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo, useState } from "react";
 import type { Filters } from "../types";
 import { isoDate } from "../utils";
 import "./PeriodControl.css";
@@ -14,7 +14,7 @@ interface Props {
   onChange: (f: Filters) => void;
 }
 
-export default function PeriodControl({ filters, onChange }: Props) {
+export default memo(function PeriodControl({ filters, onChange }: Props) {
   const [customOpen, setCustomOpen] = useState(false);
 
   const applyPreset = (days: number) => {
@@ -72,4 +72,4 @@ export default function PeriodControl({ filters, onChange }: Props) {
       )}
     </div>
   );
-}
+});

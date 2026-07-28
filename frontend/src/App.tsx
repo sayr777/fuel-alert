@@ -147,7 +147,7 @@ export default function App() {
           </div>
         </button>
         <div className="header-actions">
-          {loading && <span className="status-pill">Загрузка…</span>}
+          <span className="status-pill" style={{ visibility: loading ? "visible" : "hidden" }}>Загрузка…</span>
           <PeriodControl filters={filters} onChange={setFilters} />
         </div>
       </header>
