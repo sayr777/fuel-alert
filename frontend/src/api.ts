@@ -60,6 +60,10 @@ export function fetchRejectedReports(token: string): Promise<ReportFeature[]> {
   return fetchJson("/moderation/rejected", { headers: moderatorHeaders(token) });
 }
 
+export function fetchExpiredReports(token: string): Promise<ReportFeature[]> {
+  return fetchJson("/moderation/expired", { headers: moderatorHeaders(token) });
+}
+
 export async function publishReport(
   token: string,
   reportId: number,

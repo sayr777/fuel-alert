@@ -47,6 +47,14 @@ async def moderation_rejected(session: AsyncSession = Depends(get_session)) -> l
     return [await report_to_feature(session, r) for r in reports]
 
 
+@router.get("/expired", response_model=list[ReportFeature])
+async def moderation_expired(session: AsyncSession = Depends(get_session)) -> list[ReportFeature]:
+    stmt = select(Report).where(Report.status == "expired").order_by(Report.created_at.desc()).limit(500)
+    result = await session.execute(stmt)
+    reports = result.scalars().all()
+    return [await report_to_feature(session, r) for r in reports]
+
+
 @router.get("/health")
 async def health_check(session: AsyncSession = Depends(get_session)) -> dict:
     db_res, redis_res, tg_res, docker_res = await asyncio.gather(
@@ -114,7 +122,13 @@ async def restore_report(
     moderator_id: str = Form(...),
     session: AsyncSession = Depends(get_session),
 ) -> dict:
-    report = await _get_report_by_status(session, report_id, "rejected")
+    from sqlalchemy import or_
+    result = await session.execute(
+        select(Report).where(Report.id == report_id, or_(Report.status == "rejected", Report.status == "expired"))
+    )
+    report = result.scalar_one_or_none()
+    if report is None:
+        raise HTTPException(404, detail="report not found")
     report.status = "published"
     report.reject_reason = None
     session.add(ModerationLog(report_id=report_id, moderator_id=moderator_id, action="restore", comment=None))

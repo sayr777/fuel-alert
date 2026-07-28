@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { fetchContainerLogs, fetchHealthStatus, fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport, restoreReport, unpublishReport } from "../api";
+import { fetchContainerLogs, fetchExpiredReports, fetchHealthStatus, fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport, restoreReport, unpublishReport } from "../api";
 import type { ContainerStatus, EventType, HealthStatus, ReportFeature, ServiceHealth, Station } from "../types";
 import { flagLabel, formatExtra, gradeLabel } from "../utils";
 import "./ModerationPanel.css";
@@ -7,7 +7,7 @@ import "./ModerationPanel.css";
 const TOKEN_KEY = "fuelwatch-mod-token";
 const MOD_ID_KEY = "fuelwatch-mod-id";
 
-type Tab = "queue" | "published" | "rejected" | "monitoring";
+type Tab = "queue" | "published" | "rejected" | "expired" | "monitoring";
 
 interface Props {
   eventTypeMap: Record<string, EventType>;
@@ -20,6 +20,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
   const [queue, setQueue] = useState<ReportFeature[]>([]);
   const [published, setPublished] = useState<ReportFeature[]>([]);
   const [rejected, setRejected] = useState<ReportFeature[]>([]);
+  const [expired, setExpired] = useState<ReportFeature[]>([]);
   const [stations, setStations] = useState<Record<number, Station>>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -40,14 +41,16 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
     setLoading(true);
     setError(null);
     try {
-      const [q, pub, rej] = await Promise.all([
+      const [q, pub, rej, exp] = await Promise.all([
         fetchModerationQueue(tok),
         fetchPublishedReports(tok),
         fetchRejectedReports(tok),
+        fetchExpiredReports(tok),
       ]);
       setQueue(q);
       setPublished(pub);
       setRejected(rej);
+      setExpired(exp);
       setAuthenticated(true);
       sessionStorage.setItem(TOKEN_KEY, tok);
       sessionStorage.setItem(MOD_ID_KEY, moderatorId);
@@ -107,8 +110,9 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
   const handleRestore = async (id: number) => {
     try {
       await restoreReport(token, id, moderatorId);
-      const item = rejected.find((r) => r.properties.id === id);
+      const item = rejected.find((r) => r.properties.id === id) ?? expired.find((r) => r.properties.id === id);
       setRejected((r) => r.filter((r) => r.properties.id !== id));
+      setExpired((r) => r.filter((r) => r.properties.id !== id));
       if (item) setPublished((prev) => [{ ...item, properties: { ...item.properties, status: "published", reject_reason: null } }, ...prev]);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Ошибка восстановления");
@@ -170,10 +174,14 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
     { id: "queue", label: "Очередь", count: queue.length },
     { id: "published", label: "Опубликованные", count: filteredPublished.length },
     { id: "rejected", label: "Удалённые", count: rejected.length },
+    { id: "expired", label: "Истёкшие", count: expired.length },
     { id: "monitoring", label: "Мониторинг" },
   ];
 
-  const activeList = activeTab === "queue" ? queue : activeTab === "published" ? filteredPublished : rejected;
+  const activeList = activeTab === "queue" ? queue
+    : activeTab === "published" ? filteredPublished
+    : activeTab === "expired" ? expired
+    : rejected;
   const tabLabel = tabs.find((t) => t.id === activeTab)?.label ?? "";
 
   return (
@@ -228,7 +236,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
               <span>Автор</span>
               <span>АЗС</span>
               {activeTab === "queue" && <span>Флаги</span>}
-              {activeTab === "rejected" && <span>Причина</span>}
+              {(activeTab === "rejected" || activeTab === "expired") && <span>Причина</span>}
               {activeTab === "published" && <span>Подтверждений</span>}
               <span>Действия</span>
             </div>
@@ -271,8 +279,8 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
                         : <span className="mut">—</span>}
                     </span>
                   )}
-                  {activeTab === "rejected" && (
-                    <span className="mreject-reason">{p.reject_reason ?? "—"}</span>
+                  {(activeTab === "rejected" || activeTab === "expired") && (
+                    <span className="mreject-reason">{p.reject_reason ?? (activeTab === "expired" ? "истёк TTL" : "—")}</span>
                   )}
                   {activeTab === "published" && (
                     <span className="mconfirm">{p.confirmations_count}</span>
@@ -287,7 +295,7 @@ export default function ModerationPanel({ eventTypeMap, onClose }: Props) {
                     {activeTab === "published" && (
                       <button className="abtn n" onClick={() => handleUnpublish(p.id)} title="Убрать с карты">🗑</button>
                     )}
-                    {activeTab === "rejected" && (
+                    {(activeTab === "rejected" || activeTab === "expired") && (
                       <button className="abtn y" onClick={() => handleRestore(p.id)} title="Восстановить на карту">↩</button>
                     )}
                   </span>
