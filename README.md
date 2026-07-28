@@ -11,6 +11,7 @@
 ## Возможности
 
 - **Telegram-бот** — подача сообщений: тип события → геолокация → фото → комментарий
+- **MAX-бот** — полный аналог для мессенджера MAX (ex-ICQ/MailRu)
 - **Карта** — все актуальные сообщения в реальном времени, фильтры по типу и дате
 - **Панель модерации** — очередь, опубликованные, удалённые, мониторинг сервисов с логами контейнеров
 - **Автобэкап** — ежедневный дамп БД и синхронизация фото в Yandex Object Storage
@@ -20,13 +21,16 @@
 - [docs/architecture.md](docs/architecture.md) — архитектура и технологии
 - [docs/admin-guide.md](docs/admin-guide.md) — установка и эксплуатация
 - [docs/user-guide.md](docs/user-guide.md) — для водителей
+- [docs/max-bot-install-guide.md](docs/max-bot-install-guide.md) — установка MAX-бота
+- [docs/max-bot-admin-guide.md](docs/max-bot-admin-guide.md) — эксплуатация MAX-бота
 
 ## Стек
 
 | Компонент | Технологии |
 |---|---|
 | Backend | FastAPI, PostgreSQL/PostGIS, Redis |
-| Bot | Python, aiogram 3, FSM |
+| Bot (Telegram) | Python, aiogram 3, FSM |
+| Bot (MAX) | Python, aiohttp, Redis FSM |
 | Frontend | React 18, TypeScript, Vite, MapLibre GL |
 | Инфраструктура | Docker, Yandex Cloud, Yandex Object Storage |
 
