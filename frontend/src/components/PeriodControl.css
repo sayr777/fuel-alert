@@ -66,8 +66,17 @@
   }
 
   .period-popover {
+    right: auto;
     left: 50%;
     transform: translateX(-50%);
     flex-direction: column;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .period-popover {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
   }
 }

@@ -219,6 +219,72 @@ adguardvpn-cli connect -l "Vilnius"
 
 ---
 
+## Панель модерации
+
+Доступна по адресу `/moderation`. Авторизация — токен из `MODERATOR_TOKEN`.
+
+### Вкладки
+
+| Вкладка | Статус | Действия |
+|---|---|---|
+| Очередь | `pending` | Опубликовать ✓ / Отклонить ✕ |
+| Опубликованные | `published` | Убрать с карты 🗑 |
+| Удалённые | `rejected` | Восстановить ↩ |
+| **Истёкшие** | `expired` | Восстановить ↩ |
+| Мониторинг | — | DB / Redis / Telegram / Docker / Логи |
+
+**Истёкшие** — репорты, у которых истёк TTL (автоматически переводятся из `published` → `expired` каждые 5 минут). Кнопка ↩ возвращает их в `published` с продлением до следующего TTL-цикла.
+
+### API endpoints
+
+```
+GET  /api/v1/moderation/queue
+GET  /api/v1/moderation/published
+GET  /api/v1/moderation/rejected
+GET  /api/v1/moderation/expired          ← добавлено 2026-07-28
+GET  /api/v1/moderation/health
+GET  /api/v1/moderation/logs/{container}?tail=100
+POST /api/v1/moderation/{id}/publish
+POST /api/v1/moderation/{id}/reject
+POST /api/v1/moderation/{id}/unpublish
+POST /api/v1/moderation/{id}/restore     ← принимает rejected и expired
+```
+
+## Жизненный цикл репорта и TTL
+
+Репорт проходит статусы: `pending` → `published` → (`expired` или `rejected`).
+
+Фоновая задача `run_expiry_loop` (`backend/app/services/expiry.py`) запускается каждые 5 минут и переводит `published` → `expired` при истечении TTL. TTL задаётся в `backend/app/event_types.py`.
+
+### Актуальные TTL (на 2026-07-28)
+
+| Тип события | TTL |
+|---|---|
+| Топливо отсутствует | 5 дней |
+| Топливо появилось / в наличии | 5 дней |
+| Ограничение отпуска | 5 дней |
+| Большая очередь | 5 дней |
+| Завышенная цена | 5 дней |
+| АЗС закрыта | 5 дней |
+| Другое | 5 дней |
+| Недолив / Контрафакт | 7 дней |
+| Незаконная торговля / Мошенничество | 30 дней |
+
+Для изменения TTL — правим `ttl_hours` в `event_types.py`, деплоим только `api`.
+
+## Производительность и CDN (актуально на 2026-07-28)
+
+- **Cloudflare proxy** включён (оранжевое облако для A-записей), режим SSL — **Full**, Brotli работает автоматически
+- **MapLibre GL** вынесен в отдельный JS-чанк (`vite.config.ts → manualChunks`) — браузер кеширует его независимо
+- **nginx gzip**: уровень 6, `gzip_vary on`, `gzip_proxied any`, тип `application/wasm` добавлен
+
+## Telegram-бот — особенности
+
+- Ссылка на карту `https://dozor-fuel.online` добавлена в ответы `/start` и `/help`
+- Описание бота в профиле Telegram задаётся вручную через `@BotFather → /setdescription` — в коде не хранится
+- Для типов событий с атрибутом `fuel_grades` бот показывает шаг выбора марок топлива (АИ-92, АИ-95, АИ-98, АИ-100, ДТ, Газ) перед запросом геолокации
+- FSM: всегда добавляй фильтр `F.text` на шаги ввода текста + fallback для нетекстовых сообщений
+
 ## Эксплуатационные заметки
 
 - Устаревание событий — фоновая задача `run_expiry_loop` (`backend/app/services/expiry.py`),

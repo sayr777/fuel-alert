@@ -92,6 +92,14 @@
   transform: translateY(-50%);
 }
 
+@media (max-height: 500px) and (orientation: landscape) {
+  .maplibregl-ctrl-top-right {
+    top: auto;
+    bottom: 16px;
+    transform: none;
+  }
+}
+
 .map-toolbar {
   position: absolute;
   top: 16px;
@@ -150,6 +158,12 @@
 @media (max-width: 520px) {
   .map-toolbar {
     top: 56px;
+  }
+}
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .map-toolbar {
+    top: 44px;
   }
 }
 

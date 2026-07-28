@@ -221,3 +221,10 @@
     max-height: calc(100% - 130px);
   }
 }
+
+@media (max-height: 500px) and (orientation: landscape) {
+  .filter-panel {
+    top: 96px;
+    max-height: calc(100% - 110px);
+  }
+}
