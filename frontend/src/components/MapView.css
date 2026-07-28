@@ -147,6 +147,27 @@
   height: 14px;
 }
 
+@keyframes ya-pulse {
+  0%   { box-shadow: 0 0 0 0 rgba(255, 224, 0, 0.75); }
+  70%  { box-shadow: 0 0 0 16px rgba(255, 224, 0, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 224, 0, 0); }
+}
+
+@media (max-width: 520px) {
+  .dzmk.big {
+    background: #FFE000;
+    width: 28px;
+    height: 28px;
+    animation: ya-pulse 1.8s ease-out infinite;
+  }
+
+  .geoloc {
+    background: var(--accent);
+    color: #101214;
+    font-weight: 700;
+  }
+}
+
 .station-popup {
   font-size: 13px;
 }
