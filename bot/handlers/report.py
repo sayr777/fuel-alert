@@ -6,9 +6,11 @@ from aiogram.types import CallbackQuery, Message
 
 from api_client import ApiClient
 from keyboards import (
+    GRADE_LABELS,
     comment_keyboard,
     confirm_keyboard,
     event_type_keyboard,
+    fuel_grades_keyboard,
     location_keyboard,
     main_menu_keyboard,
     photos_keyboard,
@@ -42,7 +44,7 @@ async def cancel_report(callback: CallbackQuery, state: FSMContext) -> None:
 
 
 @router.callback_query(ReportFlow.choosing_type, F.data.startswith("etype:"))
-async def on_event_type(callback: CallbackQuery, state: FSMContext) -> None:
+async def on_event_type(callback: CallbackQuery, state: FSMContext, api: ApiClient) -> None:
     code = callback.data.split(":", 1)[1]
     if code == "OTHER":
         await state.update_data(event_type="OTHER", event_type_label="Другое", event_types=None)
@@ -52,9 +54,48 @@ async def on_event_type(callback: CallbackQuery, state: FSMContext) -> None:
         return
     data = await state.get_data()
     event_type = data["event_types"][code]
+    attrs = event_type.get("attributes", [])
     await state.update_data(event_type=code, event_type_label=event_type["label_ru"], event_types=None)
+
+    if "fuel_grades" in attrs:
+        grades = await api.get_fuel_grades()
+        await state.update_data(available_grades=grades, selected_grades=[])
+        await state.set_state(ReportFlow.choosing_grades)
+        await callback.message.edit_text(
+            f"Выбрано: {event_type['label_ru']}\n\n⛽ Выберите марку(и) топлива:",
+            reply_markup=fuel_grades_keyboard(grades, set()),
+        )
+    else:
+        await state.set_state(ReportFlow.waiting_location)
+        await callback.message.edit_text(f"Выбрано: {event_type['label_ru']}")
+        await callback.message.answer("📍 Отправьте геолокацию АЗС:", reply_markup=location_keyboard())
+    await callback.answer()
+
+
+@router.callback_query(ReportFlow.choosing_grades, F.data.startswith("grade:"))
+async def toggle_grade(callback: CallbackQuery, state: FSMContext) -> None:
+    grade = callback.data.split(":", 1)[1]
+    data = await state.get_data()
+    selected: set[str] = set(data.get("selected_grades", []))
+    selected.symmetric_difference_update({grade})
+    await state.update_data(selected_grades=list(selected))
+    await callback.message.edit_reply_markup(
+        reply_markup=fuel_grades_keyboard(data["available_grades"], selected)
+    )
+    await callback.answer()
+
+
+@router.callback_query(ReportFlow.choosing_grades, F.data == "grades:done")
+async def grades_done(callback: CallbackQuery, state: FSMContext) -> None:
+    data = await state.get_data()
+    selected: set[str] = set(data.get("selected_grades", []))
+    if not selected:
+        await callback.answer("Выберите хотя бы одну марку", show_alert=True)
+        return
+    labels = ", ".join(GRADE_LABELS.get(g, g) for g in selected)
+    await state.update_data(fuel_grades=list(selected), selected_grades=None, available_grades=None)
     await state.set_state(ReportFlow.waiting_location)
-    await callback.message.edit_text(f"Выбрано: {event_type['label_ru']}")
+    await callback.message.edit_text(f"{callback.message.text}\n\nТопливо: {labels}")
     await callback.message.answer("📍 Отправьте геолокацию АЗС:", reply_markup=location_keyboard())
     await callback.answer()
 
@@ -157,6 +198,7 @@ async def confirm_send(callback: CallbackQuery, state: FSMContext, api: ApiClien
             lat=data["lat"],
             lon=data["lon"],
             event_at=datetime.now(timezone.utc),
+            fuel_grades=data.get("fuel_grades"),
             description=data.get("description"),
             photos=photos,
         )
@@ -195,6 +237,9 @@ async def _show_confirmation(message: Message, state: FSMContext) -> None:
         f"Тип: {data['event_type_label']}",
         f"Координаты: {data['lat']:.5f}, {data['lon']:.5f}",
     ]
+    if data.get("fuel_grades"):
+        labels = ", ".join(GRADE_LABELS.get(g, g) for g in data["fuel_grades"])
+        lines.append(f"Топливо: {labels}")
     if data.get("description"):
         lines.append(f"Комментарий: {data['description']}")
     if photos:

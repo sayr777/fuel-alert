@@ -3,6 +3,7 @@ from aiogram.fsm.state import State, StatesGroup
 
 class ReportFlow(StatesGroup):
     choosing_type = State()
+    choosing_grades = State()
     entering_description = State()  # mandatory, for OTHER type (before location)
     waiting_location = State()
     waiting_photos = State()
