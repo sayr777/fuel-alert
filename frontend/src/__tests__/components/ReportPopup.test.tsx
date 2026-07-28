@@ -8,7 +8,7 @@ const EVENT_TYPE: EventType = {
   label_ru: "Топливо отсутствует",
   color: "#FF4B3E",
   requires_moderation: false,
-  ttl_hours: 24,
+  ttl_hours: 120,
   attributes: ["fuel_grades"],
 };
 

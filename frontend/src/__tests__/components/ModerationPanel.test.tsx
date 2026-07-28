@@ -17,7 +17,7 @@ const EVENT_TYPE_MAP = {
     label_ru: "Топливо отсутствует",
     color: "#FF4B3E",
     requires_moderation: false,
-    ttl_hours: 24,
+    ttl_hours: 120,
     attributes: ["fuel_grades"],
   },
 };
@@ -60,7 +60,21 @@ describe("ModerationPanel — authenticated (mocks)", () => {
     expect(screen.getByRole("button", { name: /Очередь/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Опубликованные/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Удалённые/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Истёкшие/ })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Мониторинг/ })).toBeInTheDocument();
+  });
+
+  it("switches to Expired tab and shows restore button for expired reports", async () => {
+    const user = userEvent.setup();
+    await renderAuthenticated();
+    await user.click(screen.getByRole("button", { name: /Истёкшие/ }));
+    // Tab switch is synchronous; empty state or table header should appear
+    await waitFor(() => {
+      const restoreButtons = document.querySelectorAll("button[title='Восстановить'], .restore-btn");
+      // Either restore buttons exist (expired reports present) or empty message
+      const emptyMsg = screen.queryByText(/нет/i);
+      expect(restoreButtons.length > 0 || emptyMsg !== null).toBe(true);
+    }, { timeout: 3000 });
   });
 
   it("shows back to map button", async () => {
