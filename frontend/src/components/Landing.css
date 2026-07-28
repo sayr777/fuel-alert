@@ -195,6 +195,17 @@
   color: var(--text);
 }
 
+.btn-max {
+  background: #2d5bff;
+  color: #fff;
+}
+
+.btn-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
 .feat {
   display: flex;
   gap: 12px;

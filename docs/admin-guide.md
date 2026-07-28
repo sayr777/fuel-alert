@@ -18,7 +18,8 @@ cp .env.example .env
 # заполните BOT_TOKEN в .env, если планируете поднимать бота
 
 docker compose up -d                 # PostgreSQL/PostGIS, Redis, MinIO, инициализация БД, API
-docker compose --profile bot up -d   # + Telegram-бот (отдельный профиль, по желанию)
+docker compose --profile bot up -d       # + Telegram-бот (отдельный профиль, по желанию)
+docker compose --profile bot_max up -d  # + MAX-бот (по желанию)
 ```
 
 Что поднимается (`docker-compose.yml` в корне репо — только для локального dev):
@@ -31,6 +32,7 @@ docker compose --profile bot up -d   # + Telegram-бот (отдельный п�
 | `api-init` | — | Разовая инициализация схемы + сид демо-данных, затем выходит |
 | `api` (FastAPI) | 8000 | Backend API |
 | `bot` (профиль `bot`) | — | Telegram-бот, требует `BOT_TOKEN` |
+| `bot_max` (профиль `bot_max`) | — | MAX-бот, требует `MAX_BOT_TOKEN` |
 
 Проверка: `curl http://localhost:8000/health` → `{"status": "ok"}`.
 
@@ -52,6 +54,7 @@ docker compose --profile bot up -d   # + Telegram-бот (отдельный п�
 | `S3_ENDPOINT_URL` / `S3_ACCESS_KEY` / `S3_SECRET_KEY` / `S3_BUCKET` / `S3_PUBLIC_URL` | Объектное хранилище фото (MinIO локально, любой S3-совместимый в проде) |
 | `MODERATOR_TOKEN` | Общий секрет для входа в панель модерации (заголовок `Authorization: Bearer <token>`) — **обязательно смените дефолтное значение перед продакшеном** |
 | `BOT_TOKEN` | Токен Telegram-бота от BotFather |
+| `MAX_BOT_TOKEN` | Токен MAX-бота (получить в MAX → Чат-боты → Расширенные настройки) |
 | `API_BASE_URL` | Адрес API, который использует бот (внутри docker-сети — `http://api:8000/api/v1`) |
 
 Дополнительные тонкие настройки валидации — в `backend/app/config.py` (не через `.env` по
@@ -97,7 +100,8 @@ npm run build    # прод-сборка в dist/
 |---|---|---|
 | `VITE_USE_MOCKS` | включено (кроме явных `false`/`0`) | Использовать статичные демо-данные (`src/mocks/`) вместо реального API — удобно для UI-разработки без бэкенда |
 | `VITE_API_URL` | `/api/v1` | Адрес backend API, если моки выключены |
-| `VITE_TELEGRAM_BOT_URL` | `https://t.me/fuelwatch_bot` | Ссылка на бота для кнопок «Сообщить в боте» |
+| `VITE_TELEGRAM_BOT_URL` | `https://t.me/fuelwatch_bot` | Ссылка на Telegram-бота |
+| `VITE_MAX_BOT_URL` | (пусто) | Ссылка на MAX-бота; если не задана, кнопка «Сообщить в MAX» скрыта |
 
 Для прод-сборки с реальным бэкендом: `VITE_USE_MOCKS=false VITE_API_URL=https://ваш-домен/api/v1 npm run build`.
 

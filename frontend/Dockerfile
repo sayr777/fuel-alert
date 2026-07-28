@@ -8,6 +8,7 @@ RUN npm ci
 COPY . .
 
 ARG VITE_TELEGRAM_BOT_URL
+ARG VITE_MAX_BOT_URL
 ARG VITE_USE_MOCKS=false
 RUN npm run build
 
