@@ -97,3 +97,10 @@
   color: var(--text-muted);
   font-size: 11px;
 }
+
+@media (max-width: 520px) {
+  .report-list {
+    top: 110px;
+    max-height: calc(100% - 130px);
+  }
+}

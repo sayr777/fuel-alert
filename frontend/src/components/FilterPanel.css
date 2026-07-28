@@ -214,3 +214,10 @@
   background: var(--surface-hover);
   color: var(--text);
 }
+
+@media (max-width: 520px) {
+  .filter-panel {
+    top: 110px;
+    max-height: calc(100% - 130px);
+  }
+}
