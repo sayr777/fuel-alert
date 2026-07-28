@@ -78,4 +78,5 @@ def main_menu_keyboard() -> ReplyKeyboardMarkup:
             [KeyboardButton(text="ℹ️ Помощь")],
         ],
         resize_keyboard=True,
+        is_persistent=True,
     )

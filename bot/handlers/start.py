@@ -1,5 +1,5 @@
-from aiogram import Router
-from aiogram.filters import Command, CommandStart
+from aiogram import F, Router
+from aiogram.filters import Command, CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message
 
@@ -37,3 +37,8 @@ async def cmd_help(message: Message) -> None:
         "Отчёты появляются на карте после проверки (если требуется модерация).\n\n"
         "🗺 Карта: https://dozor-fuel.online"
     )
+
+
+@router.message(StateFilter(None), ~F.text.in_({"📢 Сообщить о ситуации", "ℹ️ Помощь"}))
+async def fallback_menu(message: Message) -> None:
+    await message.answer("Главное меню:", reply_markup=main_menu_keyboard())
