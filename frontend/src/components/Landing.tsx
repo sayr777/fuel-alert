@@ -66,8 +66,7 @@ export default function Landing({ eventTypes, onOpenMap }: Props) {
             {MAX_BOT_URL && (
               <a className="btn btn-max" href={MAX_BOT_URL} target="_blank" rel="noopener noreferrer">
                 <svg className="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                  <rect width="24" height="24" rx="5" fill="none"/>
-                  <path d="M4 17V7l4 5 4-5 4 5V7h4v10h-3.5l-4.5-5.5L8 17H4z"/>
+                  <path d="M12 2C6.48 2 2 6.48 2 12c0 2.17.7 4.17 1.88 5.82L3 22l4.47-1.4A9.97 9.97 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2z"/>
                 </svg>
                 Сообщить в MAX
               </a>
