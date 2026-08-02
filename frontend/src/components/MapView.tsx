@@ -119,7 +119,8 @@ const DEFAULT_REGION = "msk";
 function localizeLabelsToRussian(map: maplibregl.Map) {
   const style = map.getStyle();
   if (!style?.layers) return;
-  const ruFirst = ["coalesce", ["get", "name_ru"], ["get", "name"], ["get", "name_en"], ""];
+  // CARTO tiles use OSM convention name:ru (colon), not name_ru (underscore).
+  const ruFirst = ["coalesce", ["get", "name:ru"], ["get", "name_ru"], ["get", "name"], ["get", "name_en"], ""];
   for (const layer of style.layers) {
     if (layer.type !== "symbol") continue;
     const current = map.getLayoutProperty(layer.id, "text-field");
@@ -175,6 +176,18 @@ function addRussianPlaceLabels(map: maplibregl.Map) {
       "text-font": ["Noto Sans Regular"],
       "text-size": ["interpolate", ["linear"], ["zoom"], 8, 9, 12, 12],
       "text-padding": 2,
+    },
+    paint,
+  });
+  // rank 4 — villages and small settlements, show from zoom 10
+  map.addLayer({
+    id: "ru-labels-r4", type: "symbol", source: "ru-labels", minzoom: 10,
+    filter: ["==", ["get", "rank"], 4],
+    layout: {
+      "text-field": ["get", "name"],
+      "text-font": ["Noto Sans Regular"],
+      "text-size": ["interpolate", ["linear"], ["zoom"], 10, 8, 13, 10],
+      "text-padding": 1,
     },
     paint,
   });

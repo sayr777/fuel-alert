@@ -44,6 +44,21 @@
     {"type":"Feature","geometry":{"type":"Point","coordinates":[37.2167,47.5667]},"properties":{"name":"Никольское","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[37.6500,48.2833]},"properties":{"name":"Красногоровка","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[37.9333,48.3333]},"properties":{"name":"Кировское","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[36.7167,47.6167]},"properties":{"name":"Великая Новосёлка","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.1833,47.9000]},"properties":{"name":"Первомайское","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[38.0667,48.3833]},"properties":{"name":"Светлодарск","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.6500,47.1167]},"properties":{"name":"Сартана","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.2833,47.0500]},"properties":{"name":"Мангуш","rank":3}},
+
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[38.0167,47.1333]},"properties":{"name":"Ольгинка","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.9333,47.1667]},"properties":{"name":"Широкино","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.4833,47.1500]},"properties":{"name":"Гнутово","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[38.2333,47.2167]},"properties":{"name":"Безыменное","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.8167,47.8333]},"properties":{"name":"Еленовка","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.9833,47.8167]},"properties":{"name":"Стыла","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.0833,46.9167]},"properties":{"name":"Ялта","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.3833,47.3833]},"properties":{"name":"Раздольное","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.5000,48.7667]},"properties":{"name":"Семёновка","rank":4}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[39.3078,48.5740]},"properties":{"name":"Луганск","rank":1}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[38.7917,48.4667]},"properties":{"name":"Алчевск","rank":1}},
@@ -58,6 +73,7 @@
     {"type":"Feature","geometry":{"type":"Point","coordinates":[39.3500,48.0833]},"properties":{"name":"Ровеньки","rank":2}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[38.1667,49.4333]},"properties":{"name":"Сватово","rank":2}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[38.9167,49.2667]},"properties":{"name":"Старобельск","rank":2}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[38.2167,49.0500]},"properties":{"name":"Кременная","rank":2}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[38.5667,48.6333]},"properties":{"name":"Первомайск","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[38.7000,48.4833]},"properties":{"name":"Брянка","rank":3}},
@@ -74,6 +90,14 @@
     {"type":"Feature","geometry":{"type":"Point","coordinates":[38.6500,48.7167]},"properties":{"name":"Золотое","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[39.5833,49.1833]},"properties":{"name":"Беловодск","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[39.5333,49.2333]},"properties":{"name":"Марковка","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[39.5667,48.6500]},"properties":{"name":"Станично-Луганское","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[38.5667,49.5000]},"properties":{"name":"Троицкое","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[39.7000,49.4833]},"properties":{"name":"Новопсков","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[39.1000,49.5000]},"properties":{"name":"Белолуцк","rank":3}},
+
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[39.2000,48.0667]},"properties":{"name":"Бирюково","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[39.0167,47.9833]},"properties":{"name":"Успенка","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[38.7333,49.5667]},"properties":{"name":"Нижняя Дуванка","rank":4}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[32.6169,46.6354]},"properties":{"name":"Херсон","rank":1}},
 
@@ -90,6 +114,13 @@
     {"type":"Feature","geometry":{"type":"Point","coordinates":[32.2333,47.0833]},"properties":{"name":"Великая Александровка","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[34.0333,46.5500]},"properties":{"name":"Нижние Серогозы","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[34.3500,46.3833]},"properties":{"name":"Новотроицкое","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[33.2667,46.2833]},"properties":{"name":"Каланчак","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[33.1833,46.8500]},"properties":{"name":"Таврийск","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[33.7333,47.4000]},"properties":{"name":"Высокополье","rank":3}},
+
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[32.3333,46.5000]},"properties":{"name":"Новая Збурьевка","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[34.0833,46.7667]},"properties":{"name":"Новая Маячка","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[33.0833,46.0500]},"properties":{"name":"Лазурное","rank":4}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[35.1775,47.8228]},"properties":{"name":"Запорожье","rank":1}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[35.3667,46.8472]},"properties":{"name":"Мелитополь","rank":1}},
@@ -111,6 +142,12 @@
     {"type":"Feature","geometry":{"type":"Point","coordinates":[35.1000,46.7167]},"properties":{"name":"Акимовка","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[35.4000,46.4500]},"properties":{"name":"Кирилловка","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[36.4167,47.1833]},"properties":{"name":"Куйбышево","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[35.5167,47.6667]},"properties":{"name":"Степногорск","rank":3}},
+
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[35.8667,47.5167]},"properties":{"name":"Работино","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[35.3667,47.8167]},"properties":{"name":"Балабино","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[36.1333,47.0667]},"properties":{"name":"Розовка","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[35.9500,47.3167]},"properties":{"name":"Малая Токмачка","rank":4}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[36.2304,49.9935]},"properties":{"name":"Харьков","rank":1}},
 
@@ -136,6 +173,16 @@
     {"type":"Feature","geometry":{"type":"Point","coordinates":[36.9000,49.8333]},"properties":{"name":"Печенеги","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[37.2000,49.2333]},"properties":{"name":"Шевченково","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[35.4333,50.4500]},"properties":{"name":"Зачепиловка","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[35.8333,49.1333]},"properties":{"name":"Сахновщина","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[36.2667,50.0000]},"properties":{"name":"Солоницевка","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[35.4167,50.0667]},"properties":{"name":"Краснокутск","rank":3}},
+
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[36.1667,49.8167]},"properties":{"name":"Покотиловка","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[36.3333,49.9500]},"properties":{"name":"Малиновка","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[36.1000,49.9500]},"properties":{"name":"Коротич","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[35.9667,50.0833]},"properties":{"name":"Пересечная","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[37.3000,50.0833]},"properties":{"name":"Великий Бурлук","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[35.6333,49.0667]},"properties":{"name":"Кегичёвка","rank":4}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[34.8000,50.9167]},"properties":{"name":"Сумы","rank":1}},
 
@@ -157,12 +204,22 @@
     {"type":"Feature","geometry":{"type":"Point","coordinates":[35.2167,51.4333]},"properties":{"name":"Краснополье","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[33.2500,52.0000]},"properties":{"name":"Новгород-Северский","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[33.7833,51.9833]},"properties":{"name":"Дружба","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[35.1500,51.6167]},"properties":{"name":"Миропилье","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[34.1667,51.1333]},"properties":{"name":"Ворожба","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[34.0167,50.7500]},"properties":{"name":"Липовая Долина","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[34.3333,51.3333]},"properties":{"name":"Хотень","rank":3}},
+
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[34.4833,50.5333]},"properties":{"name":"Боромля","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[34.6333,51.3667]},"properties":{"name":"Терны","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[33.6000,51.4167]},"properties":{"name":"Батурин","rank":4}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[30.7233,46.4775]},"properties":{"name":"Одесса","rank":1}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[28.8453,45.3430]},"properties":{"name":"Измаил","rank":2}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[31.0500,46.6333]},"properties":{"name":"Южное","rank":2}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[29.5500,47.7500]},"properties":{"name":"Подольск","rank":2}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[30.0667,46.8333]},"properties":{"name":"Раздельная","rank":2}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[30.9000,47.2167]},"properties":{"name":"Берёзовка","rank":2}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[30.3500,46.1833]},"properties":{"name":"Белгород-Днестровский","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[30.6667,46.3167]},"properties":{"name":"Черноморск","rank":3}},
@@ -177,6 +234,16 @@
     {"type":"Feature","geometry":{"type":"Point","coordinates":[29.5667,45.4000]},"properties":{"name":"Вилково","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[29.1667,46.1667]},"properties":{"name":"Тарутино","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[30.0667,47.9333]},"properties":{"name":"Саврань","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[29.5667,45.8333]},"properties":{"name":"Татарбунары","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[29.9333,47.3500]},"properties":{"name":"Ширяево","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[29.3333,47.1667]},"properties":{"name":"Красные Окны","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[30.2667,47.8333]},"properties":{"name":"Любашёвка","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[30.1000,46.5667]},"properties":{"name":"Великая Михайловка","rank":3}},
+
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[30.5000,46.4833]},"properties":{"name":"Великодолинское","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[29.7167,47.2333]},"properties":{"name":"Захаровка","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[28.8333,45.9833]},"properties":{"name":"Табаки","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[29.1333,46.5333]},"properties":{"name":"Тарутино","rank":4}},
 
     {"type":"Feature","geometry":{"type":"Point","coordinates":[31.9946,46.9750]},"properties":{"name":"Николаев","rank":1}},
 
@@ -191,6 +258,13 @@
     {"type":"Feature","geometry":{"type":"Point","coordinates":[32.2833,47.3167]},"properties":{"name":"Березнеговатое","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[30.3667,48.3500]},"properties":{"name":"Кривоозёрское","rank":3}},
     {"type":"Feature","geometry":{"type":"Point","coordinates":[31.2167,47.8500]},"properties":{"name":"Врадиевка","rank":3}},
-    {"type":"Feature","geometry":{"type":"Point","coordinates":[30.9833,47.9167]},"properties":{"name":"Арбузинка","rank":3}}
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[30.9833,47.9167]},"properties":{"name":"Арбузинка","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[31.7000,47.6667]},"properties":{"name":"Еланец","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[29.7500,47.5167]},"properties":{"name":"Доманёвка","rank":3}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[31.3667,47.8667]},"properties":{"name":"Казанка","rank":3}},
+
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[31.0833,48.1000]},"properties":{"name":"Братское","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[31.6667,47.3833]},"properties":{"name":"Веселиново","rank":4}},
+    {"type":"Feature","geometry":{"type":"Point","coordinates":[31.2667,47.1167]},"properties":{"name":"Октябрьское","rank":4}}
   ]
 }
