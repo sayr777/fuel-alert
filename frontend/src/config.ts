@@ -4,7 +4,7 @@ export const USE_MOCKS =
 
 export const TELEGRAM_BOT_URL = import.meta.env.VITE_TELEGRAM_BOT_URL ?? "https://t.me/toplivny_dozor_bot?start=1";
 
-export const MAX_BOT_URL = import.meta.env.VITE_MAX_BOT_URL ?? "";
+export const MAX_BOT_URL = import.meta.env.VITE_MAX_BOT_URL ?? "https://max.ru/id772705555866_1_bot";
 
 export const SHARE_URL: string =
   import.meta.env.VITE_SHARE_URL ??
