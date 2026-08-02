@@ -118,7 +118,7 @@ const DEFAULT_REGION = "msk";
 function localizeLabelsToRussian(map: maplibregl.Map) {
   const style = map.getStyle();
   if (!style?.layers) return;
-  const ruFirst = ["coalesce", ["get", "name_ru"], ["get", "name"], ["get", "name_en"], ""];
+  const ruFirst = ["coalesce", ["get", "name_ru"], ["get", "name_en"], ""];
   for (const layer of style.layers) {
     if (layer.type !== "symbol") continue;
     const current = map.getLayoutProperty(layer.id, "text-field");
