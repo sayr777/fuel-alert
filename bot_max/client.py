@@ -15,9 +15,12 @@ class MaxClient:
 
     async def _sess(self) -> aiohttp.ClientSession:
         if self._session is None or self._session.closed:
+            # platform-api2.max.ru uses a Russian government CA not in standard bundles
+            connector = aiohttp.TCPConnector(ssl=False)
             self._session = aiohttp.ClientSession(
                 base_url=MAX_API,
                 headers={"Authorization": self._token},
+                connector=connector,
             )
         return self._session
 
