@@ -34,10 +34,11 @@ async def dispatch_update(
         await handle_callback(user_id, callback_id, payload, client, api, fsm)
 
     elif update_type == "message_created":
-        user = update.get("user", {})
-        user_id = user.get("user_id", 0)
-        nickname = user.get("username") or user.get("first_name")
-        body = update.get("message", {}).get("body", {})
+        msg = update.get("message", {})
+        sender = msg.get("sender", {})
+        user_id = sender.get("user_id", 0)
+        nickname = sender.get("username") or sender.get("name") or sender.get("first_name")
+        body = msg.get("body", {})
         text: str = body.get("text") or ""
         attachments: list[dict] = body.get("attachments") or []
 

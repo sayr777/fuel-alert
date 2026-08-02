@@ -333,9 +333,9 @@ async def _send_state_hint(user_id: int, state: str, client: MaxClient) -> None:
 def _extract_location(attachments: list[dict]) -> tuple[float, float] | None:
     for att in attachments:
         if att.get("type") == "location":
-            payload = att.get("payload", {})
-            lat = payload.get("latitude")
-            lon = payload.get("longitude")
+            # MAX sends lat/lon at attachment root level, not inside payload
+            lat = att.get("latitude")
+            lon = att.get("longitude")
             if lat is not None and lon is not None:
                 return float(lat), float(lon)
     return None
