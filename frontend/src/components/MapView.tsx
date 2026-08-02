@@ -135,31 +135,6 @@ const REGIONS: Record<string, Region> = {
 
 const DEFAULT_REGION = "msk";
 
-// Force all place/waterway label layers to prefer name_ru → name → name_en.
-// CARTO hardcodes name_en for countries, states, city dots and waterways at every zoom;
-// some tiles include name_ru for Russian-language names (incl. Донецк, Луганск, Мариуполь).
-function localizeLabelsToRussian(map: maplibregl.Map) {
-  const style = map.getStyle();
-  if (!style?.layers) return;
-  // CARTO tiles use OSM convention name:ru (colon), not name_ru (underscore).
-  const ruFirst = ["coalesce", ["get", "name:ru"], ["get", "name_ru"], ["get", "name"], ["get", "name_en"], ""];
-  for (const layer of style.layers) {
-    if (layer.type !== "symbol") continue;
-    const current = map.getLayoutProperty(layer.id, "text-field");
-    if (current == null) continue;
-    if (JSON.stringify(current).includes("name")) {
-      map.setLayoutProperty(layer.id, "text-field", ruFirst);
-    }
-  }
-}
-
-// Hide country border lines (boundary_country_outline / boundary_country_inner).
-function hideBorders(map: maplibregl.Map) {
-  for (const id of ["boundary_country_outline", "boundary_country_inner"]) {
-    if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", "none");
-  }
-}
-
 // Add Russian-language city labels for Donetsk, Luhansk, Zaporizhzhia, Kherson,
 // Kharkiv, Odesa, Mykolaiv and Sumy oblasts, overriding CARTO's name_en labels.
 function addRussianPlaceLabels(map: maplibregl.Map) {
