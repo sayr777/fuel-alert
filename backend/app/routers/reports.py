@@ -100,6 +100,28 @@ async def submit_report(
 
     await session.commit()
 
+    # Notify admin bot about new pending report
+    from app.redis_client import get_redis
+    from app.event_types import EVENT_TYPES
+    import json as _json
+    _redis = get_redis()
+    if _redis and report.status == "pending":
+        _et = EVENT_TYPES.get(report.event_type)
+        _payload = {
+            "id": report.id,
+            "event_type": report.event_type,
+            "event_type_label": _et.label_ru if _et else report.event_type,
+            "fuel_grades": report.fuel_grades or [],
+            "lat": lat,
+            "lon": lon,
+            "description": description,
+            "username": None,
+        }
+        try:
+            await _redis.publish("admin:new_report", _json.dumps(_payload))
+        except Exception:
+            pass
+
     return ReportSubmitResult(
         id=report.id,
         status=report.status,

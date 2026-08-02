@@ -75,6 +75,7 @@ def main_menu_keyboard() -> ReplyKeyboardMarkup:
     return ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="📢 Сообщить о ситуации")],
+            [KeyboardButton(text="💡 Пожелание")],
             [KeyboardButton(text="ℹ️ Помощь")],
         ],
         resize_keyboard=True,

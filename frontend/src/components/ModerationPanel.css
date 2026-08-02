@@ -583,6 +583,51 @@
   font-style: italic;
 }
 
+.sys-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sys-card {
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.sys-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.sys-bar-wrap {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--border);
+  overflow: hidden;
+  margin-bottom: 6px;
+}
+
+.sys-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.sys-val {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.sys-pct {
+  font-weight: 600;
+  margin-left: 4px;
+}
+
 @media (max-width: 1000px) {
   .mrow {
     grid-template-columns: 50px 140px 1fr 96px;

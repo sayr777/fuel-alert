@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import get_settings
+from app.redis_client import close_redis, init_redis
 from app.routers import event_types, moderation, reports, stations, users
 from app.services.expiry import run_expiry_loop
 
@@ -13,6 +14,7 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    await init_redis(settings.redis_url)
     expiry_task = asyncio.create_task(run_expiry_loop())
     yield
     expiry_task.cancel()
@@ -20,6 +22,7 @@ async def lifespan(app: FastAPI):
         await expiry_task
     except asyncio.CancelledError:
         pass
+    await close_redis()
 
 
 app = FastAPI(title="FuelWatch API", version="0.1.0", lifespan=lifespan)

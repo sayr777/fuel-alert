@@ -57,11 +57,12 @@ async def moderation_expired(session: AsyncSession = Depends(get_session)) -> li
 
 @router.get("/health")
 async def health_check(session: AsyncSession = Depends(get_session)) -> dict:
-    db_res, redis_res, tg_res, docker_res = await asyncio.gather(
+    db_res, redis_res, tg_res, docker_res, sys_res = await asyncio.gather(
         _check_db(session),
         _check_redis(),
         _check_telegram(),
         _check_docker(),
+        _check_system(),
     )
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -69,6 +70,7 @@ async def health_check(session: AsyncSession = Depends(get_session)) -> dict:
         "redis": redis_res,
         "telegram": tg_res,
         "containers": docker_res,
+        "system": sys_res,
     }
 
 
@@ -226,6 +228,50 @@ async def _check_docker() -> list[dict]:
         return await asyncio.to_thread(_docker_sync)
     except Exception as e:
         return [{"name": "docker", "status": f"error: {e}", "running": False}]
+
+
+def _system_info_sync() -> dict:
+    import shutil
+    result: dict = {}
+    try:
+        with open("/proc/loadavg") as f:
+            parts = f.read().split()
+        result["load_avg"] = {"1m": float(parts[0]), "5m": float(parts[1]), "15m": float(parts[2])}
+    except Exception:
+        result["load_avg"] = None
+    try:
+        mem: dict[str, int] = {}
+        with open("/proc/meminfo") as f:
+            for line in f:
+                p = line.split()
+                if len(p) >= 2:
+                    mem[p[0].rstrip(":")] = int(p[1])
+        total = mem.get("MemTotal", 0) * 1024
+        available = mem.get("MemAvailable", 0) * 1024
+        used = total - available
+        result["memory"] = {
+            "total_mb": round(total / 1024**2),
+            "used_mb": round(used / 1024**2),
+            "available_mb": round(available / 1024**2),
+            "percent": round(used / total * 100, 1) if total else 0,
+        }
+    except Exception:
+        result["memory"] = None
+    try:
+        usage = shutil.disk_usage("/")
+        result["disk"] = {
+            "total_gb": round(usage.total / 1024**3, 1),
+            "used_gb": round(usage.used / 1024**3, 1),
+            "free_gb": round(usage.free / 1024**3, 1),
+            "percent": round(usage.used / usage.total * 100, 1),
+        }
+    except Exception:
+        result["disk"] = None
+    return result
+
+
+async def _check_system() -> dict:
+    return await asyncio.to_thread(_system_info_sync)
 
 
 # ── container logs ────────────────────────────────────────────────────────────

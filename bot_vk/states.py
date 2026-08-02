@@ -1,0 +1,9 @@
+# VK FSM states as string constants (stored in Redis)
+class ReportState:
+    CHOOSING_TYPE = "choosing_type"
+    CHOOSING_GRADES = "choosing_grades"
+    ENTERING_DESCRIPTION = "entering_description"
+    WAITING_LOCATION = "waiting_location"
+    WAITING_PHOTOS = "waiting_photos"
+    ENTERING_COMMENT = "entering_comment"
+    CONFIRMING = "confirming"

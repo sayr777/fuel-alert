@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { fetchContainerLogs, fetchExpiredReports, fetchHealthStatus, fetchModerationQueue, fetchPublishedReports, fetchRejectedReports, fetchStations, publishReport, rejectReport, restoreReport, unpublishReport } from "../api";
-import type { ContainerStatus, EventType, HealthStatus, ReportFeature, ServiceHealth, Station } from "../types";
+import type { ContainerStatus, EventType, HealthStatus, ReportFeature, ServiceHealth, Station, SystemMetrics } from "../types";
 import { flagLabel, formatExtra, gradeLabel } from "../utils";
 import "./ModerationPanel.css";
 
@@ -337,6 +337,51 @@ function ContainerRow({ c }: { c: ContainerStatus }) {
   );
 }
 
+function SysBar({ percent }: { percent: number }) {
+  const color = percent > 85 ? "#e74c3c" : percent > 70 ? "#f39c12" : "#27ae60";
+  return (
+    <div className="sys-bar-wrap">
+      <div className="sys-bar" style={{ width: `${percent}%`, background: color }} />
+    </div>
+  );
+}
+
+function SystemCard({ metrics }: { metrics: SystemMetrics }) {
+  return (
+    <div className="sys-grid">
+      {metrics.memory && (
+        <div className="sys-card">
+          <div className="sys-label">Память</div>
+          <SysBar percent={metrics.memory.percent} />
+          <div className="sys-val">
+            {metrics.memory.used_mb} / {metrics.memory.total_mb} МБ
+            <span className="sys-pct"> {metrics.memory.percent}%</span>
+          </div>
+        </div>
+      )}
+      {metrics.disk && (
+        <div className="sys-card">
+          <div className="sys-label">Диск</div>
+          <SysBar percent={metrics.disk.percent} />
+          <div className="sys-val">
+            {metrics.disk.used_gb} / {metrics.disk.total_gb} ГБ
+            <span className="sys-pct"> {metrics.disk.percent}%</span>
+            <span className="mut"> · свободно {metrics.disk.free_gb} ГБ</span>
+          </div>
+        </div>
+      )}
+      {metrics.load_avg && (
+        <div className="sys-card">
+          <div className="sys-label">Загрузка CPU (1м / 5м / 15м)</div>
+          <div className="sys-val mono">
+            {metrics.load_avg["1m"]} / {metrics.load_avg["5m"]} / {metrics.load_avg["15m"]}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 function MonitoringTab({ health, loading, onRefresh, token }: { health: HealthStatus | null; loading: boolean; onRefresh: () => void; token: string }) {
   return (
     <div className="mon-wrap">
@@ -368,6 +413,13 @@ function MonitoringTab({ health, loading, onRefresh, token }: { health: HealthSt
                 <ContainerRow key={c.name} c={c} />
               ))}
             </div>
+
+            {health.system && (
+              <>
+                <div className="mon-section-label">Ресурсы сервера</div>
+                <SystemCard metrics={health.system} />
+              </>
+            )}
           </>
         )}
       </div>

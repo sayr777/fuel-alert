@@ -62,12 +62,19 @@ export interface ContainerStatus {
   running: boolean;
 }
 
+export interface SystemMetrics {
+  load_avg: { "1m": number; "5m": number; "15m": number } | null;
+  memory: { total_mb: number; used_mb: number; available_mb: number; percent: number } | null;
+  disk: { total_gb: number; used_gb: number; free_gb: number; percent: number } | null;
+}
+
 export interface HealthStatus {
   timestamp: string;
   database: ServiceHealth;
   redis: ServiceHealth;
   telegram: ServiceHealth;
   containers: ContainerStatus[];
+  system?: SystemMetrics;
 }
 
 export interface Filters {

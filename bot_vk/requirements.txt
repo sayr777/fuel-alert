@@ -1,0 +1,4 @@
+vkbottle==4.3.12
+pydantic-settings==2.6.1
+aiohttp==3.10.10
+redis==5.2.0

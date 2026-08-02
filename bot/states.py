@@ -9,3 +9,7 @@ class ReportFlow(StatesGroup):
     waiting_photos = State()
     entering_comment = State()      # optional, for all types (after photos)
     confirming = State()
+
+
+class FeedbackFlow(StatesGroup):
+    entering_feedback = State()

@@ -120,6 +120,40 @@ services:
     profiles:
       - bot_max
 
+  bot_admin:
+    build: ../bot_admin
+    network_mode: host
+    environment:
+      ADMIN_BOT_TOKEN: ${ADMIN_BOT_TOKEN}
+      ADMIN_CHAT_ID: ${ADMIN_CHAT_ID}
+      API_BASE_URL: http://127.0.0.1:8000/api/v1
+      MODERATOR_TOKEN: ${MODERATOR_TOKEN}
+      REDIS_URL: redis://:${REDIS_PASSWORD}@localhost:6379/2
+    depends_on:
+      api:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - bot_admin
+
+  bot_vk:
+    build: ../bot_vk
+    network_mode: host
+    environment:
+      VK_GROUP_TOKEN: ${VK_GROUP_TOKEN}
+      API_BASE_URL: http://127.0.0.1:8000/api/v1
+      REDIS_URL: redis://:${REDIS_PASSWORD}@localhost:6379/3
+    depends_on:
+      api:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    profiles:
+      - bot_vk
+
 volumes:
   pgdata:
   redisdata:
