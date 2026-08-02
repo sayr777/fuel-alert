@@ -6,6 +6,7 @@ import { brandStyle } from "../brands";
 import ReportPopup from "./ReportPopup";
 import "maplibre-gl/dist/maplibre-gl.css";
 import "./MapView.css";
+import ruPlaceLabels from "../data/ru-place-labels.json";
 
 const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
@@ -136,6 +137,49 @@ function hideBorders(map: maplibregl.Map) {
   }
 }
 
+// Add Russian-language city labels for Donetsk, Luhansk, Zaporizhzhia, Kherson,
+// Kharkiv, Odesa, Mykolaiv and Sumy oblasts, overriding CARTO's name_en labels.
+function addRussianPlaceLabels(map: maplibregl.Map) {
+  map.addSource("ru-labels", { type: "geojson", data: ruPlaceLabels as unknown as maplibregl.GeoJSONSourceSpecification["data"] });
+  const paint = { "text-color": "#e8e8e8", "text-halo-color": "#0a0a12", "text-halo-width": 1.5 };
+  // rank 1 — major cities (≥100 k), show from zoom 4
+  map.addLayer({
+    id: "ru-labels-r1", type: "symbol", source: "ru-labels", minzoom: 4,
+    filter: ["==", ["get", "rank"], 1],
+    layout: {
+      "text-field": ["get", "name"],
+      "text-font": ["Open Sans Bold"],
+      "text-size": ["interpolate", ["linear"], ["zoom"], 4, 11, 8, 14, 12, 16],
+      "text-padding": 4,
+    },
+    paint,
+  });
+  // rank 2 — medium cities, show from zoom 6
+  map.addLayer({
+    id: "ru-labels-r2", type: "symbol", source: "ru-labels", minzoom: 6,
+    filter: ["==", ["get", "rank"], 2],
+    layout: {
+      "text-field": ["get", "name"],
+      "text-font": ["Noto Sans Regular"],
+      "text-size": ["interpolate", ["linear"], ["zoom"], 6, 10, 8, 12, 12, 14],
+      "text-padding": 3,
+    },
+    paint,
+  });
+  // rank 3 — smaller towns, show from zoom 8
+  map.addLayer({
+    id: "ru-labels-r3", type: "symbol", source: "ru-labels", minzoom: 8,
+    filter: ["==", ["get", "rank"], 3],
+    layout: {
+      "text-field": ["get", "name"],
+      "text-font": ["Noto Sans Regular"],
+      "text-size": ["interpolate", ["linear"], ["zoom"], 8, 9, 12, 12],
+      "text-padding": 2,
+    },
+    paint,
+  });
+}
+
 interface MarkerHandle {
   marker: maplibregl.Marker;
   root: Root;
@@ -179,6 +223,7 @@ export default function MapView({ reports, stations, eventTypeMap, onBboxChange 
     map.on("load", () => {
       localizeLabelsToRussian(map);
       hideBorders(map);
+      addRussianPlaceLabels(map);
       emitBbox();
       setMapReady(true);
     });
