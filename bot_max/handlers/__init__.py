@@ -17,7 +17,6 @@ async def dispatch_update(
     api: ApiClient,
     fsm: MaxFSM,
 ) -> None:
-    logger.info("UPDATE: %s", update)
     update_type = update.get("update_type")
 
     if update_type == "bot_started":
