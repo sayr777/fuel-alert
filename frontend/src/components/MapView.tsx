@@ -112,19 +112,27 @@ const REGIONS: Record<string, Region> = {
 
 const DEFAULT_REGION = "msk";
 
-// CARTO's carto.streets vector schema only has two name fields per feature: `name` (local
-// language — Cyrillic for Russian places) and `name_en`. Country/state/continent/big-city-dot
-// labels and waterway names are hardcoded to name_en at every zoom in the stock style, and the
-// place/lake labels switch from name_en to name only above a zoom threshold. Force every one of
-// those layers to always use the local `name` field instead.
+// Force all place/waterway label layers to prefer name_ru → name → name_en.
+// CARTO hardcodes name_en for countries, states, city dots and waterways at every zoom;
+// some tiles include name_ru for Russian-language names (incl. Донецк, Луганск, Мариуполь).
 function localizeLabelsToRussian(map: maplibregl.Map) {
   const style = map.getStyle();
   if (!style?.layers) return;
+  const ruFirst = ["coalesce", ["get", "name_ru"], ["get", "name"], ["get", "name_en"], ""];
   for (const layer of style.layers) {
     if (layer.type !== "symbol") continue;
     const current = map.getLayoutProperty(layer.id, "text-field");
-    if (current == null || !JSON.stringify(current).includes("name_en")) continue;
-    map.setLayoutProperty(layer.id, "text-field", ["get", "name"]);
+    if (current == null) continue;
+    if (JSON.stringify(current).includes("name")) {
+      map.setLayoutProperty(layer.id, "text-field", ruFirst);
+    }
+  }
+}
+
+// Hide country border lines (boundary_country_outline / boundary_country_inner).
+function hideBorders(map: maplibregl.Map) {
+  for (const id of ["boundary_country_outline", "boundary_country_inner"]) {
+    if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", "none");
   }
 }
 
@@ -170,6 +178,7 @@ export default function MapView({ reports, stations, eventTypeMap, onBboxChange 
     };
     map.on("load", () => {
       localizeLabelsToRussian(map);
+      hideBorders(map);
       emitBbox();
       setMapReady(true);
     });
