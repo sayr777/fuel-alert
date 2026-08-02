@@ -8,7 +8,29 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./MapView.css";
 import ruPlaceLabels from "../data/ru-place-labels.json";
 
-const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
+// Yandex raster tiles with Russian labels (lang=ru_RU).
+// Glyphs from OpenMapTiles CDN are required for rendering our custom GeoJSON text labels.
+const MAP_STYLE: maplibregl.StyleSpecification = {
+  version: 8,
+  glyphs: "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
+  sources: {
+    yandex: {
+      type: "raster",
+      tiles: [
+        "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}&scale=1&lang=ru_RU",
+      ],
+      tileSize: 256,
+      attribution: "© Яндекс",
+    },
+  },
+  layers: [
+    {
+      id: "yandex-base",
+      type: "raster",
+      source: "yandex",
+    },
+  ],
+};
 
 interface Region {
   name: string;
@@ -142,7 +164,8 @@ function hideBorders(map: maplibregl.Map) {
 // Kharkiv, Odesa, Mykolaiv and Sumy oblasts, overriding CARTO's name_en labels.
 function addRussianPlaceLabels(map: maplibregl.Map) {
   map.addSource("ru-labels", { type: "geojson", data: ruPlaceLabels as unknown as maplibregl.GeoJSONSourceSpecification["data"] });
-  const paint = { "text-color": "#e8e8e8", "text-halo-color": "#0a0a12", "text-halo-width": 1.5 };
+  // Dark text + white halo — readable on both Yandex light tiles and CARTO dark.
+  const paint = { "text-color": "#1a1a2e", "text-halo-color": "#ffffff", "text-halo-width": 1.8 };
   // rank 1 — major cities (≥100 k), show from zoom 4
   map.addLayer({
     id: "ru-labels-r1", type: "symbol", source: "ru-labels", minzoom: 4,
@@ -234,8 +257,7 @@ export default function MapView({ reports, stations, eventTypeMap, onBboxChange 
       );
     };
     map.on("load", () => {
-      localizeLabelsToRussian(map);
-      hideBorders(map);
+      // Yandex raster tiles already display Russian labels — no localizeLabelsToRussian needed.
       addRussianPlaceLabels(map);
       emitBbox();
       setMapReady(true);
