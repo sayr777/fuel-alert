@@ -8,29 +8,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import "./MapView.css";
 import ruPlaceLabels from "../data/ru-place-labels.json";
 
-// Yandex raster tiles with Russian labels (lang=ru_RU).
-// Glyphs from OpenMapTiles CDN are required for rendering our custom GeoJSON text labels.
-const MAP_STYLE: maplibregl.StyleSpecification = {
-  version: 8,
-  glyphs: "https://fonts.openmaptiles.org/{fontstack}/{range}.pbf",
-  sources: {
-    yandex: {
-      type: "raster",
-      tiles: [
-        "https://core-renderer-tiles.maps.yandex.net/tiles?l=map&x={x}&y={y}&z={z}&scale=1&lang=ru_RU",
-      ],
-      tileSize: 256,
-      attribution: "© Яндекс",
-    },
-  },
-  layers: [
-    {
-      id: "yandex-base",
-      type: "raster",
-      source: "yandex",
-    },
-  ],
-};
+const MAP_STYLE = "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json";
 
 interface Region {
   name: string;
@@ -135,12 +113,33 @@ const REGIONS: Record<string, Region> = {
 
 const DEFAULT_REGION = "msk";
 
+function localizeLabelsToRussian(map: maplibregl.Map) {
+  const style = map.getStyle();
+  if (!style?.layers) return;
+  // CARTO tiles store Russian names as name:ru (OSM colon convention), not name_ru.
+  const ruFirst = ["coalesce", ["get", "name:ru"], ["get", "name_ru"], ["get", "name"], ["get", "name_en"], ""];
+  for (const layer of style.layers) {
+    if (layer.type !== "symbol") continue;
+    const current = map.getLayoutProperty(layer.id, "text-field");
+    if (current == null) continue;
+    if (JSON.stringify(current).includes("name")) {
+      map.setLayoutProperty(layer.id, "text-field", ruFirst);
+    }
+  }
+}
+
+function hideBorders(map: maplibregl.Map) {
+  for (const id of ["boundary_country_outline", "boundary_country_inner"]) {
+    if (map.getLayer(id)) map.setLayoutProperty(id, "visibility", "none");
+  }
+}
+
 // Add Russian-language city labels for Donetsk, Luhansk, Zaporizhzhia, Kherson,
-// Kharkiv, Odesa, Mykolaiv and Sumy oblasts, overriding CARTO's name_en labels.
+// Kharkiv, Odesa, Mykolaiv and Sumy oblasts, overriding CARTO's labels.
 function addRussianPlaceLabels(map: maplibregl.Map) {
   map.addSource("ru-labels", { type: "geojson", data: ruPlaceLabels as unknown as maplibregl.GeoJSONSourceSpecification["data"] });
-  // Dark text + white halo — readable on both Yandex light tiles and CARTO dark.
-  const paint = { "text-color": "#1a1a2e", "text-halo-color": "#ffffff", "text-halo-width": 1.8 };
+  // Light text + dark halo for CARTO dark background.
+  const paint = { "text-color": "#e8e8e8", "text-halo-color": "#0a0a12", "text-halo-width": 1.5 };
   // rank 1 — major cities (≥100 k), show from zoom 4
   map.addLayer({
     id: "ru-labels-r1", type: "symbol", source: "ru-labels", minzoom: 4,
@@ -232,7 +231,8 @@ export default function MapView({ reports, stations, eventTypeMap, onBboxChange 
       );
     };
     map.on("load", () => {
-      // Yandex raster tiles already display Russian labels — no localizeLabelsToRussian needed.
+      localizeLabelsToRussian(map);
+      hideBorders(map);
       addRussianPlaceLabels(map);
       emitBbox();
       setMapReady(true);
